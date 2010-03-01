@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+$-w = true
+$:.unshift(File.dirname(__FILE__)+"/../lib/")
+
+require "string_additions"
+NUM_PKGS = 1500
+
+if ARGV.size != 1
+  $stderr.puts "Usage: ProcessPopCon <Popularity Contest Data File>"
+  exit(1)
+end
+
+PkgStats = {}
+
+File.new(ARGV[0]).each do |line|
+  if line.startswith? "Package: "
+    s = line.split[1..-1]
+    PkgStats[s[0]] = s[1..-1].map{|v| v.to_i}
+  end
+end
+
+def nvotes(list); list.map{|el| el[1][0]}.reduce(:+); end
+
+total_list = PkgStats.sort{|a,b| a[1][0] <=> b[1][0]}
+selection = total_list[-NUM_PKGS..-1]
+
+total_votes = nvotes(total_list)
+selection_votes = nvotes(selection)
+vote_fraction = selection_votes.to_f/total_votes.to_f
+package_fraction = NUM_PKGS.to_f/total_list.size.to_f
+
+puts "Covering #{NUM_PKGS}/#{total_list.size} packages (#{package_fraction})"
+puts "Covering #{selection_votes}/#{total_votes} votes (#{vote_fraction})"

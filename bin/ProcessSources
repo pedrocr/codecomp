@@ -1,0 +1,19 @@
+#!/usr/bin/env ruby
+$-w = true
+$:.unshift(File.dirname(__FILE__)+"/../lib/")
+
+require "string_additions"
+require "sources_info"
+
+if ARGV.size != 1
+  $stderr.puts "Usage: ProcessSources <SourcesFile>"
+  exit(1)
+end
+
+s = SourcesInfo.new(ARGV[0])
+
+bin = "libgeda-dev"
+pkg = s.bin_to_package(bin)
+orig = s.package_to_orig(pkg)
+diff = s.package_to_diff(pkg)
+puts "bin: #{bin}\n pkg: #{pkg}\n orig: #{orig}\n diff: #{diff}"
