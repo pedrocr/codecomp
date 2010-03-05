@@ -4,17 +4,23 @@ $:.unshift(File.dirname(__FILE__)+"/../lib/")
 
 require "string_additions"
 require "sources_info"
+require "comparator"
 
-if ARGV.size != 1
-  $stderr.puts "Usage: ProcessSources <SourcesFile>"
+if ARGV.size != 2
+  $stderr.puts "Usage: ProcessSources <Distro1> <Distro2>"
   exit(1)
 end
 
-s = SourcesInfo.new(ARGV[0])
+s1 = SourcesInfo.new(ARGV[0])
+s2 = SourcesInfo.new(ARGV[1])
 
-bin = "libgeda-dev"
-pkg = s.bin_to_package(bin)
-file = s.package_to_file(pkg)
-puts "bin: #{bin}\n pkg: #{pkg}\n orig: #{file.orig.filename}\n diff: #{file.diff.filename}\n dsc: #{file.dsc.filename}"
+bin = "nautilus"
+pkg1 = s1.bin_to_package(bin)
+pkg2 = s2.bin_to_package(bin)
 
-file.download("/tmp/")
+if pkg1 != pkg2
+  $stderr.write "Error: source packages for #{bin} differ (#{pkg1} vs #{pkg2})"
+  exit 1
+end
+
+Comparator.compare(pkg1, s1, s2)

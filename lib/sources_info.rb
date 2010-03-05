@@ -1,17 +1,30 @@
 require "tmpdir"
 require "fileutils"
+require "utils"
 
 class SourcesInfo
-  def initialize(filename)
+  attr_reader :distro
+
+  def initialize(distro, repos=["main", "multiverse", "restricted", "universe"])
     @BinToPackage = {}
     @PackageToFile = {}
+    @distro = distro
 
+    repos.each do |repo|
+      repofile = "Sources-#{distro}-#{repo}.bz2"
+      fullpath = Archive.get("/dists/#{distro}/#{repo}/source/Sources.bz2",
+                               repofile)
+      parsefile(fullpath)
+    end
+  end
+
+  def parsefile(filename)
     currpkg = nil
     in_files_section = false
     fileobj = nil
     dir = nil
 
-    File.open(filename).each do |line|
+    IO.popen("bzcat #{filename}").each do |line|
       if line.include? ":"
         in_files_section = false 
         fileobj = nil
@@ -49,50 +62,55 @@ class FileInfo
 end
 
 class SourcePkg
-  NSEC_RETRY = 30
-
-  attr_accessor :package, :orig, :diff, :dsc, :directory, :pkgcache
+  
+  attr_accessor :package, :orig, :diff, :dsc, :directory
   def initialize(package, dir, pkgcache="./pkgcache/")
     @package = package
     @directory = dir
     @pkgcache = pkgcache
   end
 
-  def download(dest_dir=".")
-    get_from_archive(@orig)
-    get_from_archive(@diff)
+  def download(distname, dest_dir=".")
+    origfile = get_from_archive(@orig)
+    difffile = get_from_archive(@diff)
   
-    run_cmd "tar -C #{dest_dir} -zxpf #{pkgcache}/#{@orig.filename}"
     origdir = @orig.filename[0...-".orig.tar.gz".size]
     origdir.gsub!(package+"_", package+"-")
-    origdir = dest_dir+"/"+origdir
-    run_cmd "zcat #{pkgcache}/#{@diff.filename} | patch -p1 -d #{origdir}"
+
+    FileUtils.mkdir tmpdir = dest_dir+"/"+origdir+"-"+distname+".tmpdir"
+    Util.run_cmd "tar -C #{tmpdir} -zxpf #{origfile}"
+    tardir = tmpdir+"/"+origdir
+    Util.run_cmd "zcat #{difffile} | patch -p1 -d #{tardir}"
+    finaldir = dest_dir+"/"+origdir+"-"+distname
+    FileUtils.mv(tardir, finaldir)
+    FileUtils.rmdir tmpdir
+    finaldir
   end
 
-  private
-
+  private 
   def get_from_archive(file)
+    Archive.get("/#{@directory}/#{file.filename}", file.filename)
+  end
+end
+
+class Archive
+  BASE_URL="http://archive.ubuntu.com/ubuntu/"
+  CACHE_DIR = "./pkgcache/"
+  NSEC_RETRY = 30
+
+  def self.get(url, filename)
     #FIXME Check md5 if it already exists and at the end
-    FileUtils.mkdir_p(@pkgcache)
-    if File.exists? @pkgcache+"/"+file.filename
-      $stderr.puts "#{file.filename} already in cache"
+    FileUtils.mkdir_p(CACHE_DIR)
+    fullpath = CACHE_DIR+"/"+filename
+    if File.exists? fullpath
+      $stderr.puts "#{filename} already in cache"
     else
-      cmd = "wget http://archive.ubuntu.com/ubuntu/#{directory}/#{file.filename}"
-      cmd += " -nv -O #{@pkgcache}/#{file.filename}"
-      while !run_cmd(cmd, false)
+      cmd = "curl -o #{fullpath} #{BASE_URL}/#{url}"  
+      while !Util.run_cmd(cmd, false)
         $stderr.puts "Trying again in #{NSEC_RETRY} seconds"
         sleep NSEC_RETRY
       end
     end
-  end
-
-  def run_cmd(cmd, exit_on_error=true)
-    $stderr.puts "++ Running: #{cmd}"
-    r = system(cmd)
-    if !r
-      $stderr.puts "-- Error Running Command: #" 
-      exit 1 if exit_on_error
-    end
-    r
+    fullpath
   end
 end
