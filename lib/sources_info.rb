@@ -62,7 +62,9 @@ class FileInfo
 end
 
 class SourcePkg
-  
+  SOURCE_EXTS = ["c","cc","h","rb","py","cs","java","pl","php","sh","vala",
+                 "xml","po",".js","ui","glade","css","d","desktop","f","html"]  
+
   attr_accessor :package, :orig, :diff, :dsc, :directory
   def initialize(package, dir, pkgcache="./pkgcache/")
     @package = package
@@ -74,14 +76,22 @@ class SourcePkg
     origfile = get_from_archive(@orig)
     difffile = get_from_archive(@diff)
   
+    #Unpack the original file
     origdir = @orig.filename[0...-".orig.tar.gz".size]
     origdir.gsub!(package+"_", package+"-")
-
     FileUtils.mkdir tmpdir = dest_dir+"/"+origdir+"-"+distname+".tmpdir"
     Util.run_cmd "tar -C #{tmpdir} -zxpf #{origfile}"
     tardir = tmpdir+"/"+origdir
+
+    #Apply the diff
     Util.run_cmd "zcat #{difffile} | patch -s -p1 -d #{tardir}"
     finaldir = dest_dir+"/"+origdir+"-"+distname
+
+    #Remove all non-source files
+    ext_cond = SOURCE_EXTS.map{|e| "-not -name \"*.#{e}\""}.join(" ")
+    Util.run_cmd "find #{tardir} #{ext_cond} -type f | xargs -n 10 rm"
+
+    #Move directory into its final naming
     FileUtils.mv(tardir, finaldir)
     FileUtils.rmdir tmpdir
     finaldir

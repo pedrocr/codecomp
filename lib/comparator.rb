@@ -8,6 +8,7 @@ class Comparator
     with_tmp_dirs(pkgname) do |tmpdir|
       dir1 = file1.download(sources1.distro, tmpdir)
       dir2 = file2.download(sources2.distro, tmpdir)
+      Util.run_cmd("find #{dir1} -type f -print0 | wc -l --files0-from=- | tail -n 1")
       Util.run_cmd("diff -r #{dir1} #{dir2} | diffstat -b -f 0 | tail -n 1")
     end
   end
