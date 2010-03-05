@@ -14,11 +14,13 @@ class Comparator
 
   private
   def self.with_tmp_dirs(pkgname)
-    #tmpdir = Dir.tmpdir+"/"+Process.pid.to_s+"/"+@package
-    tmpdir = Dir.tmpdir+"/ubuntu_evolution/"+pkgname
-    FileUtils.rm_rf tmpdir
+    tmpdir = Dir.tmpdir+"/"+Process.pid.to_s+"-"+pkgname
+    if File.exists? tmpdir
+      $stderr.puts "ERROR #{tmpdir} already exists!"
+      exit 1
+    end
     FileUtils.mkdir_p tmpdir
     yield tmpdir
-    #FileUtils.rm_rf tmpdir
+    FileUtils.rm_rf tmpdir
   end
 end
