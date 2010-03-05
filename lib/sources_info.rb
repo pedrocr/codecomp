@@ -80,7 +80,7 @@ class SourcePkg
     FileUtils.mkdir tmpdir = dest_dir+"/"+origdir+"-"+distname+".tmpdir"
     Util.run_cmd "tar -C #{tmpdir} -zxpf #{origfile}"
     tardir = tmpdir+"/"+origdir
-    Util.run_cmd "zcat #{difffile} | patch -p1 -d #{tardir}"
+    Util.run_cmd "zcat #{difffile} | patch -s -p1 -d #{tardir}"
     finaldir = dest_dir+"/"+origdir+"-"+distname
     FileUtils.mv(tardir, finaldir)
     FileUtils.rmdir tmpdir
