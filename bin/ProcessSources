@@ -14,6 +14,7 @@ s = SourcesInfo.new(ARGV[0])
 
 bin = "libgeda-dev"
 pkg = s.bin_to_package(bin)
-orig = s.package_to_orig(pkg)
-diff = s.package_to_diff(pkg)
-puts "bin: #{bin}\n pkg: #{pkg}\n orig: #{orig}\n diff: #{diff}"
+file = s.package_to_file(pkg)
+puts "bin: #{bin}\n pkg: #{pkg}\n orig: #{file.orig.filename}\n diff: #{file.diff.filename}\n dsc: #{file.dsc.filename}"
+
+file.download("/tmp/")
