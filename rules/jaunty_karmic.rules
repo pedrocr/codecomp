@@ -1,0 +1,32 @@
+#Binary packages that should be collapsed into a single comparison
+same_bin "firefox", "firefox-3.0", "firefox-3.5", "firefox-3.6"
+same_bin "linux-image-generic-.*"
+same_bin "gcc-.*"
+
+# Binary packages that are not in Ubuntu, are not worth comparing, 
+# or throw spurious warnings
+ignore_bin "googleearth"
+ignore_bin "virtualbox-3.1"
+ignore_bin "adobe-flashplugin"
+ignore_bin "skype"
+ignore_bin "opera"
+ignore_bin "acroread"
+ignore_bin "wine1.2"
+ignore_bin "nautilus-dropbox"
+ignore_bin "linux-libc-dev"
+ignore_bin "nvidia-glx-.*"
+ignore_bin "mono-git"
+
+# Source for the libraries is now util-linux but these are not the same source
+ignore_bin "libblkid1", "libuuid1", "uuid-runtime"
+include_src "e2fsprogs"
+include_src "util-linux"
+ignore_bin "mktemp"
+include_src "coreutils"
+
+# Deletion and addition of whole source packages
+deleted_in "karmic", "mktemp"
+deleted_in "karmic", "ibus-qt4"
+added_in "karmic", "xsplash"
+added_in "karmic", "software-center"
+

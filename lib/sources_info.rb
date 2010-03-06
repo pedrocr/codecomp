@@ -50,6 +50,8 @@ class SourcesInfo
 
   def bin_to_package(bin); @BinToPackage[bin]; end
   def package_to_file(pkg); @PackageToFile[pkg]; end
+  def include_bin?(bin); @BinToPackage.include? bin; end
+  def include_src?(src); @PackageToFile.include? src; end
 end
 
 class FileInfo

@@ -1,4 +1,4 @@
-require "utils.rb"
+require "utils"
 
 class Comparator
   def self.compare(pkgname, sources1, sources2)

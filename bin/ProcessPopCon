@@ -1,12 +1,10 @@
 #!/usr/bin/env ruby
 $-w = true
-$:.unshift(File.dirname(__FILE__)+"/../lib/")
+require File.dirname(__FILE__)+"/../lib/all"
 
-require "string_additions"
-NUM_PKGS = 1500
-
-if ARGV.size != 1
-  $stderr.puts "Usage: ProcessPopCon <Popularity Contest Data File>"
+NUM_PKGS = ARGV[1].to_i
+if ARGV.size != 3 || NUM_PKGS == 0
+  $stderr.puts "Usage: ProcessPopCon <PopCon File> <N Pop Packages> <OutputFilePkgList>"
   exit(1)
 end
 
@@ -22,12 +20,17 @@ end
 def nvotes(list); list.map{|el| el[1][0]}.reduce(:+); end
 
 total_list = PkgStats.sort{|a,b| a[1][0] <=> b[1][0]}
-selection = total_list[-NUM_PKGS..-1]
+selection = total_list[0-NUM_PKGS..-1]
 
 total_votes = nvotes(total_list)
 selection_votes = nvotes(selection)
 vote_fraction = selection_votes.to_f/total_votes.to_f
 package_fraction = NUM_PKGS.to_f/total_list.size.to_f
+
+#Output a list of packages with the number of regular users
+File.open(ARGV[2],"w") do |f| 
+  selection.reverse.each {|p| f.puts "#{p[0]} #{p[1][0]}"}
+end
 
 puts "Covering #{NUM_PKGS}/#{total_list.size} packages (#{package_fraction})"
 puts "Covering #{selection_votes}/#{total_votes} votes (#{vote_fraction})"

@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 $-w = true
-$:.unshift(File.dirname(__FILE__)+"/../lib/")
+require File.dirname(__FILE__)+"/../lib/all"
 
 require "string_additions"
 require "sources_info"
@@ -19,7 +19,7 @@ pkg1 = s1.bin_to_package(bin)
 pkg2 = s2.bin_to_package(bin)
 
 if pkg1 != pkg2
-  $stderr.write "Error: source packages for #{bin} differ (#{pkg1} vs #{pkg2})"
+  $stderr.puts "Error: source packages for #{bin} differ (#{pkg1} vs #{pkg2})"
   exit 1
 end
 

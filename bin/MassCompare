@@ -1,0 +1,37 @@
+#!/usr/bin/env ruby
+$-w = true
+require File.dirname(__FILE__)+"/../lib/all"
+
+if ARGV.size != 3
+  $stderr.puts "Usage: ProcessSources <PkgList> <Distro1> <Distro2>"
+  exit 1
+end
+
+dist1 = ARGV[1]
+dist2 = ARGV[2]
+
+re = RuleEngine.load("rules/#{dist1}_#{dist2}.rules")
+
+exit 1
+
+s1 = SourcesInfo.new(dist1)
+s2 = SourcesInfo.new(dist2)
+
+File.new(ARGV[0]).each do |line|
+  pkg, number = line.split
+  src1 = s1.bin_to_package(pkg)
+  src2 = s2.bin_to_package(pkg)
+  if src1 and !src2
+    puts "WARNING: Possible removed package #{pkg} in #{dist2}"
+  elsif !src1 and src2
+    if not s1.include_src? src1 # Check that it isn't an extra binary from the same source
+      puts "WARNING: Possible added package #{pkg} in #{dist2}"
+    end
+  elsif !src1 and !src2
+    puts "WARNING: Package #{pkg} doesn't exist in #{dist1} or #{dist2}"
+  #elsif pkg1 != pkg2
+  #  puts "WARNING: Source packages for #{pkg} differ (#{pkg1} in #{dist1}|#{pkg2} in #{dist2})"
+  #else
+    #puts "Source package for #{pkg} is #{pkg1}"
+  end
+end
