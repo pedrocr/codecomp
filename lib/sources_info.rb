@@ -5,6 +5,7 @@ require "utils"
 class SourceBundle
   attr_reader :src, :exprs, :sinfo
   def initialize(sinfo, options)
+    @src = nil
     if options[:src] 
       @src = options[:src] 
       @matches = [options[:src]]
@@ -17,6 +18,18 @@ class SourceBundle
   def match?(src)
     @matches.include? src
   end
+
+  def to_s
+    @src ? @src : @exprs.join("|")
+  end
+
+  def ==(sb)
+    self.src ? self.src == sb.src : self.exprs == sb.exprs
+  end
+
+  def pkg
+    @matches.sort[-1]
+  end 
 
   private
   def find_all_matching_srcs(exprs, sinfo)
@@ -77,6 +90,10 @@ class SourcesInfo
   def package_to_file(pkg); @PackageToFile[pkg]; end
   def include_bin?(bin); @BinToPackage.include? bin; end
   def include_src?(src); @PackageToFile.include? src; end
+
+  def include_bundle?(sb)
+    self.each{|p| sb.match? p}.inject{|a,b| a or b}
+  end
 
   def each
     @PackageToFile.keys.each {|k| yield k}

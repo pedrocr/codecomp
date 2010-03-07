@@ -21,5 +21,6 @@ $stderr.puts "Finished determining package matchups, #{re.errors} errors and #{r
 if re.errors > 0
   $stderr.puts "Aborting due to errors in package matchups, correct those to advance"
 else
-  $stderr.puts "Success!!"
+  $stderr.puts "Success!! Printing Matchups"
+  re.matchups.each{|s1,s2| puts "#{s1} #{s2}"}
 end

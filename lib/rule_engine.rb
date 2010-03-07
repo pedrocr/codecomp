@@ -16,7 +16,7 @@ class RuleEngine
     @include_srcs = []
     @same_srcs = {}
 
-    @comparison_pairs = {}
+    @matchup_pairs = {}
     @warnings = 0
     @errors = 0
   end
@@ -43,17 +43,23 @@ class RuleEngine
     @added_in[src] = dist
   end
 
-  def add_comparison(src1, src2)
-    @comparison_pairs[[src1,src2]] = true
+  def add_matchup(sb1, sb2)
+    @matchup_pairs[[sb1,sb2]] = true
+  end
+
+  def matchups
+    @matchup_pairs.keys.map do |sb1, sb2| 
+      [sb1 ? sb1.pkg : "-", sb2 ? sb2.pkg : "-"]
+    end
   end
 
   def warn(message)
-    puts "Warning: #{message}"
+    $stderr.puts "Warning: #{message}"
     @warnings += 1
   end
 
   def error(message)
-    puts "ERROR: #{message}"
+    $stderr.puts "ERROR: #{message}"
     @errors += 1
   end
 
@@ -66,67 +72,59 @@ class RuleEngine
     dist2 = @sinfo2.distro
     bins.each do |bin|
       if not find_ignore_bin_match(bin)
-        sb1 = @sinfo1.bin_to_bundle(bin)
-        sb2 = @sinfo2.bin_to_bundle(bin)
-        if sb1 and sb2 and sb1 != sb2
-          error "#{bin}: source package #{src1} matches #{expr1} and #{src2} matches #{expr2}"
-        else 
-          process_srcs(expr, sb1, sb2)
-        end
-      end
-    end
-    @same_srcs.each do |expr, values|
-      if (values[0] == []) ^ (values[1] == []) # Only one dist matched
-        dist_matched = values[0] != [] ? dist1 : dist2
-        matches = values[0] != [] ? values[0] : values[1]
-        error "same_src expression \"#{expr}\" only matched for #{dist_matched} (matches #{matches})"
-      elsif values[0] != [] and values[1] != []
-        # Use the highest numbered package from each distro
-        process_srcs(expr, values[0].sort[-1], values[1].sort[-1])
-      else # values[0] == [] and values[1] == []
-        warn "No packages matched same_src expression \"#{expr}\""
+        process_bundles(bin, @sinfo1.bin_to_bundle(bin), @sinfo2.bin_to_bundle(bin))
       end
     end
   end
 
-  # Process a binary file given the rules and using two SourceInfo objects
-  def process_srcs(bin, src1, src2)
+  def deleted_in?(sb, dist)
+    key = @deleted_in.keys.find{|k| sb.match? k}
+    key and @deleted_in[key] == dist
+  end
+
+  def added_in?(sb, dist)
+    key = @added_in.keys.find{|k| sb.match? k}
+    key and @added_in[key] == dist
+  end
+
+  # Given two source bundles from a given binary file generate the pairings
+  def process_bundles(bin, sb1, sb2)
     dist1 = @sinfo1.distro
     dist2 = @sinfo2.distro
-    if src1 and !src2
-      if @deleted_in[src1] == dist2
-        add_comparison(src1, nil)
-      elsif @sinfo2.include_src? src1
-        add_comparison(src1, src2)
+    if sb1 and !sb2
+      if deleted_in? sb1, dist2
+        add_matchup(sb1, nil)
+      elsif @sinfo2.include_bundle? sb1
+        add_matchup(sb1, sb2)
       else
-        error "#{bin}: #{src1} doesn't exist in #{dist2}, removed?"
+        error "#{bin}: #{sb1} doesn't exist in #{dist2}, removed?"
       end
-    elsif !src1 and src2
-      if @sinfo1.include_src? src2
+    elsif !sb1 and sb2
+      if @sinfo1.include_bundle? sb2
         # Must be an extra binary from the same source
-        add_comparison(src2, src2)
-      elsif @added_in[src2] == dist2
-        add_comparison(nil, src2)
+        add_matchup(sb1, sb2)
+      elsif added_in? sb2, dist2
+        add_matchup(nil, sb2)
       else
-        error "#{bin}: #{src2} doesn't exist in #{dist1}, added?"
+        error "#{bin}: #{sb2} doesn't exist in #{dist1}, added?"
       end
-    elsif !src1 and !src2
+    elsif !sb1 and !sb2
       warn "Package #{bin} doesn't exist in #{dist1} or #{dist2}, ignoring"
-    elsif src1 == src2 
+    elsif sb1 == sb2 
       #Normal case
-      add_comparison(src1, src2) 
-    elsif src1 != src2
-      if @deleted_in[src1] == dist2
-        add_comparison(src1, nil)
+      add_matchup(sb1, sb2) 
+    elsif sb1 != sb2
+      if deleted_in? sb1, dist2
+        add_matchup(sb1, nil)
         #For binaries that are moved into an existing source
-        add_comparison(src2, src2) if @sinfo1.include_src? src2
-      elsif @added_in[src2] == dist2
-        add_comparison(nil, src2)
+        add_matchup(sb2, sb2) if @sinfo1.include_bundle? sb2
+      elsif added_in? sb2, dist2
+        add_matchup(nil, sb2)
         #For binaries that are moved into a new source
-        add_comparison(src1, src1) if @sinfo2.include_src? src1
+        add_matchup(sb1, sb1) if @sinfo2.include_bundle? sb1
       else
-        warn "#{bin}: Source packages for #{bin} differ (#{src1} in #{dist1}|#{src2} in #{dist2}), comparing anyway"
-        add_comparison(src1, src2)
+        warn "#{bin}: Source packages for #{bin} differ (#{sb1} in #{dist1}|#{sb2} in #{dist2}), comparing anyway"
+        add_matchup(sb1, sb2)
       end
     else
       puts "BUG IN process_bin parser in #{__FILE__}, this should not have happened!"
