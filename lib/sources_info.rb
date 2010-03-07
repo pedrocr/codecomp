@@ -2,12 +2,37 @@ require "tmpdir"
 require "fileutils"
 require "utils"
 
+class SourceBundle
+  attr_reader :src, :exprs, :sinfo
+  def initialize(sinfo, options)
+    if options[:src] 
+      @src = options[:src] 
+      @matches = [options[:src]]
+    elsif options[:exprs]
+      @exprs = options[:exprs]
+      @matches = find_all_matching_srcs(options[:exprs], sinfo)
+    end
+  end
+  
+  def match?(src)
+    @matches.include? src
+  end
+
+  private
+  def find_all_matching_srcs(exprs, sinfo)
+    sinfo.find_all{|src| exprs.map{|e| Util.match_expansion(e, src)}.inject{|a,b| a or b}}
+  end
+end
+
 class SourcesInfo
   attr_reader :distro
+  include Enumerable
 
   def initialize(distro, repos=["main", "multiverse", "restricted", "universe"])
     @BinToPackage = {}
     @PackageToFile = {}
+    @simple_bundles = {}
+    @wildcard_bundles = []
     @distro = distro
 
     repos.each do |repo|
@@ -52,6 +77,21 @@ class SourcesInfo
   def package_to_file(pkg); @PackageToFile[pkg]; end
   def include_bin?(bin); @BinToPackage.include? bin; end
   def include_src?(src); @PackageToFile.include? src; end
+
+  def each
+    @PackageToFile.keys.each {|k| yield k}
+  end
+
+  def add_wildcard_bundle(exprs)
+    @wildcard_bundles << SourceBundle.new(self, :exprs=>exprs)
+  end
+
+  def bin_to_bundle(bin)
+    src = bin_to_package(bin)
+    return nil if not src
+    @wildcard_bundles.each {|b| return b if b.match? src}
+    @simple_bundles[src] ||= SourceBundle.new(self, :src=>src)
+  end
 end
 
 class FileInfo

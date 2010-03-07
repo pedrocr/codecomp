@@ -8,4 +8,17 @@ class Util
     end
     r
   end
+
+  def self.match_expansion(str, name)
+    expr = str.scan(/([^\*\?]+|[\*\?])/).map do |m|
+      if m[0] == "*"
+        ".*"
+      elsif m[0] == "?"
+        "."
+      else
+        Regexp.escape(m[0]) 
+      end
+    end.join("")
+    not Regexp.new("^"+expr+"$").match(name).nil?
+  end
 end
