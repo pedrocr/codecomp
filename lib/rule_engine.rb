@@ -1,15 +1,9 @@
 class RuleEngine
   attr_reader :warnings, :errors
 
-  def self.load(filename, s1, s2)
-    re = new(s1, s2)
-    re.instance_eval(File.read(filename), filename)
-    re
-  end
-
-  def initialize(sinfo1, sinfo2)
-    @sinfo1 = sinfo1
-    @sinfo2 = sinfo2
+  def initialize(dist1, dist2)
+    @sinfo1 = SourcesInfo.new(dist1)
+    @sinfo2 = SourcesInfo.new(dist2)
     @ignore_bins = []
     @deleted_in = {}
     @added_in = {}
@@ -19,6 +13,9 @@ class RuleEngine
     @matchup_pairs = {}
     @warnings = 0
     @errors = 0
+
+    filename = File.dirname(__FILE__)+"/../rules/#{dist1}_#{dist2}.rules"
+    self.instance_eval(File.read(filename),filename)
   end
 
   def same_src(expr1, *exprs)
@@ -48,9 +45,11 @@ class RuleEngine
   end
 
   def matchups
-    @matchup_pairs.keys.map do |sb1, sb2| 
-      [sb1 ? sb1.pkg : "-", sb2 ? sb2.pkg : "-"]
-    end
+    @matchup_pairs.keys.map{|sb1, sb2| [sb1 ? sb1.pkg : nil, sb2 ? sb2.pkg : nil]}
+  end
+
+  def clear_matchups
+    @matchup_pairs = {}
   end
 
   def warn(message)
@@ -67,13 +66,18 @@ class RuleEngine
     @ignore_bins.map{|e| Util.match_expansion(e, bin)}.inject{|a,b| a or b}
   end
 
-  def process_bins(bins)
+  def process(bins)
     dist1 = @sinfo1.distro
     dist2 = @sinfo2.distro
     bins.each do |bin|
       if not find_ignore_bin_match(bin)
-        process_bundles(bin, @sinfo1.bin_to_bundle(bin), @sinfo2.bin_to_bundle(bin))
+        bundle1 = @sinfo1.bin_to_bundle(bin)
+        bundle2 = @sinfo2.bin_to_bundle(bin)
+        process_bundles(bin, bundle1, bundle2)
       end
+    end
+    @include_srcs.each do |src|
+      process_bundles(src, @sinfo1.src_to_bundle(src), @sinfo2.src_to_bundle(src))
     end
   end
 
@@ -94,15 +98,15 @@ class RuleEngine
     if sb1 and !sb2
       if deleted_in? sb1, dist2
         add_matchup(sb1, nil)
-      elsif @sinfo2.include_bundle? sb1
-        add_matchup(sb1, sb2)
+      elsif newsb2 = sb1.find_correspondent(@sinfo2)
+        add_matchup(sb1, newsb2)
       else
         error "#{bin}: #{sb1} doesn't exist in #{dist2}, removed?"
       end
     elsif !sb1 and sb2
-      if @sinfo1.include_bundle? sb2
+      if newsb1 = sb2.find_correspondent(@sinfo1)
         # Must be an extra binary from the same source
-        add_matchup(sb1, sb2)
+        add_matchup(newsb1, sb2)
       elsif added_in? sb2, dist2
         add_matchup(nil, sb2)
       else
@@ -117,11 +121,11 @@ class RuleEngine
       if deleted_in? sb1, dist2
         add_matchup(sb1, nil)
         #For binaries that are moved into an existing source
-        add_matchup(sb2, sb2) if @sinfo1.include_bundle? sb2
+        add_matchup(newsb1, sb2) if newsb1 = sb2.find_correspondent(@sinfo1)
       elsif added_in? sb2, dist2
         add_matchup(nil, sb2)
         #For binaries that are moved into a new source
-        add_matchup(sb1, sb1) if @sinfo2.include_bundle? sb1
+        add_matchup(sb1, newsb2) if newsb2 = sb1.find_correspondent(@sinfo2)
       else
         warn "#{bin}: Source packages for #{bin} differ (#{sb1} in #{dist1}|#{sb2} in #{dist2}), comparing anyway"
         add_matchup(sb1, sb2)

@@ -3,7 +3,7 @@ require "fileutils"
 require "utils"
 
 class SourceBundle
-  attr_reader :src, :exprs, :sinfo
+  attr_reader :src, :exprs, :sinfo, :matches
   def initialize(sinfo, options)
     @src = nil
     if options[:src] 
@@ -27,9 +27,30 @@ class SourceBundle
     self.src ? self.src == sb.src : self.exprs == sb.exprs
   end
 
+  def hash
+    self.src ? self.src.hash : self.exprs.hash
+  end
+
+  def eql?(sb)
+    self.src ? self.src.eql?(sb.src) : self.exprs.eql?(sb.exprs)
+  end
+
   def pkg
     @matches.sort[-1]
   end 
+
+  def find_correspondent(sinfo)
+    if @src
+      if sinfo.include_pkg? @src
+        SourceBundle.new(sinfo, :src => @src)
+      else
+        nil
+      end
+    else
+      b = SourceBundle.new(sinfo, :exprs => @exprs)
+      b.matches.size > 0 ? b : nil
+    end
+  end
 
   private
   def find_all_matching_srcs(exprs, sinfo)
@@ -91,8 +112,8 @@ class SourcesInfo
   def include_bin?(bin); @BinToPackage.include? bin; end
   def include_src?(src); @PackageToFile.include? src; end
 
-  def include_bundle?(sb)
-    self.each{|p| sb.match? p}.inject{|a,b| a or b}
+  def include_pkg?(pkg)
+    @PackageToFile.keys.include? pkg
   end
 
   def each
@@ -104,7 +125,9 @@ class SourcesInfo
   end
 
   def bin_to_bundle(bin)
-    src = bin_to_package(bin)
+    src_to_bundle(bin_to_package(bin))
+  end
+  def src_to_bundle(src)
     return nil if not src
     @wildcard_bundles.each {|b| return b if b.match? src}
     @simple_bundles[src] ||= SourceBundle.new(self, :src=>src)

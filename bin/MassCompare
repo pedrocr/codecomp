@@ -10,17 +10,15 @@ end
 dist1 = ARGV[1]
 dist2 = ARGV[2]
 
-s1 = SourcesInfo.new(dist1)
-s2 = SourcesInfo.new(dist2)
-re = RuleEngine.load("rules/#{dist1}_#{dist2}.rules", s1, s2)
+re = RuleEngine.new(dist1, dist2)
 
 bins = File.new(ARGV[0]).map {|line| pkg, number = line.split; pkg}
-re.process_bins(bins)
+re.process(bins)
 
 $stderr.puts "Finished determining package matchups, #{re.errors} errors and #{re.warnings} warnings"
 if re.errors > 0
   $stderr.puts "Aborting due to errors in package matchups, correct those to advance"
 else
   $stderr.puts "Success!! Printing Matchups"
-  re.matchups.each{|s1,s2| puts "#{s1} #{s2}"}
+  re.matchups.each{|s1,s2| puts "#{s1 ? s1.to_s : 'nil'} #{s2 ? s2.to_s : 'nil'}"}
 end
