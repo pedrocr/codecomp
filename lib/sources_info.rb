@@ -159,7 +159,7 @@ class SourcePkg
     difffile = get_from_archive(@diff) if @diff
   
     #Unpack the original file
-    origdir = @orig.filename[0...-".orig.tar.gz".size]
+    origdir = @orig.filename.sub(".tar.gz", "")
     FileUtils.mkdir tmpdir = dest_dir+"/"+origdir+"-"+distname+".tmpdir"
     Util.run_cmd "tar -C #{tmpdir} -zxpf #{origfile}"
     newdir = Dir.entries(tmpdir).find{|d| d != "." && d != ".."}
@@ -172,7 +172,7 @@ class SourcePkg
     extensions = SOURCE_EXTS+SOURCE_EXTS.map{|e| e.upcase}
     ext_cond = extensions.map{|e| "-not -name \"*.#{e}\""}.join(" ")
     delete_files = File.open("#{tardir}/deleted_files", "w")
-    IO.popen("find #{tardir} #{ext_cond} -not -type d").each do |line|
+    IO.popen("find #{tardir} -type l && find #{tardir} #{ext_cond} -not -type d").each do |line|
       line = line.strip
       if not line.endswith? "deleted_files"
         delete_files.puts line
