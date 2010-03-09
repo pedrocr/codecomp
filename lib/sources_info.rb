@@ -41,7 +41,7 @@ class SourceBundle
 
   def find_correspondent(sinfo)
     if @src
-      if sinfo.include_pkg? @src
+      if sinfo.include_src? @src
         SourceBundle.new(sinfo, :src => @src)
       else
         nil
@@ -112,10 +112,6 @@ class SourcesInfo
   def include_bin?(bin); @BinToPackage.include? bin; end
   def include_src?(src); @PackageToFile.include? src; end
 
-  def include_pkg?(pkg)
-    @PackageToFile.keys.include? pkg
-  end
-
   def each
     @PackageToFile.keys.each {|k| yield k}
   end
@@ -127,6 +123,7 @@ class SourcesInfo
   def bin_to_bundle(bin)
     src_to_bundle(bin_to_package(bin))
   end
+
   def src_to_bundle(src)
     return nil if not src
     @wildcard_bundles.each {|b| return b if b.match? src}
@@ -144,8 +141,9 @@ class FileInfo
 end
 
 class SourcePkg
-  SOURCE_EXTS = ["c","cc","h","rb","py","cs","java","pl","php","sh","vala",
-                 "xml","po",".js","ui","glade","css","d","desktop","f","html"]  
+  SOURCE_EXTS = ["c","cc","h","rb","py","cs","java","pl", "xs", "php","sh","vala",
+                 "xml","po",".js","ui","glade","css","d","desktop","f","html",
+                 "yml", ".json", "tex", "txt", "s", "diff", "patch", "dpatch"]  
 
   attr_accessor :package, :orig, :diff, :dsc, :directory
   def initialize(package, dir, pkgcache="./pkgcache/")
@@ -160,18 +158,25 @@ class SourcePkg
   
     #Unpack the original file
     origdir = @orig.filename[0...-".orig.tar.gz".size]
-    origdir.gsub!(package+"_", package+"-")
     FileUtils.mkdir tmpdir = dest_dir+"/"+origdir+"-"+distname+".tmpdir"
     Util.run_cmd "tar -C #{tmpdir} -zxpf #{origfile}"
-    tardir = tmpdir+"/"+origdir
+    newdir = Dir.entries(tmpdir).find{|d| d != "." && d != ".."}
+    tardir = tmpdir+"/"+newdir
 
     #Apply the diff
     Util.run_cmd "zcat #{difffile} | patch -s -p1 -d #{tardir}"
     finaldir = dest_dir+"/"+origdir+"-"+distname
 
     #Remove all non-source files
-    ext_cond = SOURCE_EXTS.map{|e| "-not -name \"*.#{e}\""}.join(" ")
-    Util.run_cmd "find #{tardir} #{ext_cond} -type f | xargs -n 10 rm"
+    extensions = SOURCE_EXTS+SOURCE_EXTS.map{|e| e.upcase}
+    ext_cond = extensions.map{|e| "-not -name \"*.#{e}\""}.join(" ")
+    delete_files = File.open("#{tardir}/deleted_files", "w")
+    IO.popen("find #{tardir} #{ext_cond} -type f").each do |line|
+      line = line.strip
+      delete_files.puts line
+      FileUtils.rm line
+    end
+    delete_files.close
 
     #Move directory into its final naming
     FileUtils.mv(tardir, finaldir)

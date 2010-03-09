@@ -1,0 +1,26 @@
+#!/usr/bin/env ruby
+$-w = true
+require File.dirname(__FILE__)+"/../lib/all"
+
+require "string_additions"
+require "sources_info"
+require "comparator"
+
+if ARGV.size != 4
+  $stderr.puts "Usage: ProcessSources <Package1> <Package2> <Distro1> <Distro2>"
+  exit(1)
+end
+
+pkg1 = ARGV[0]
+pkg2 = ARGV[1]
+s1 = SourcesInfo.new(ARGV[2])
+s2 = SourcesInfo.new(ARGV[3])
+
+if pkg1 != pkg2
+  $stderr.puts "Error: source packages for #{bin} differ (#{pkg1} vs #{pkg2})"
+  exit 1
+end
+
+Comparator.compare(pkg1, pkg2, s1, s2)
+Comparator.compare(nil, pkg2, s1, s2)
+Comparator.compare(pkg1, nil, s1, s2)

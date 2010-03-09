@@ -1,9 +1,9 @@
 class RuleEngine
   attr_reader :warnings, :errors
 
-  def initialize(dist1, dist2)
-    @sinfo1 = SourcesInfo.new(dist1)
-    @sinfo2 = SourcesInfo.new(dist2)
+  def initialize(sinfo1, sinfo2)
+    @sinfo1 = sinfo1
+    @sinfo2 = sinfo2
     @ignore_bins = []
     @deleted_in = {}
     @added_in = {}
@@ -14,7 +14,7 @@ class RuleEngine
     @warnings = 0
     @errors = 0
 
-    filename = File.dirname(__FILE__)+"/../rules/#{dist1}_#{dist2}.rules"
+    filename = File.dirname(__FILE__)+"/../rules/#{sinfo1.distro}_#{sinfo2.distro}.rules"
     self.instance_eval(File.read(filename),filename)
   end
 
