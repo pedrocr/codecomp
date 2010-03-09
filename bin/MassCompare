@@ -25,7 +25,8 @@ if re.errors > 0
 end
 
 $stderr.puts "Success!! Proceeding with comparison"
-re.matchups.each do |s1,s2| 
-  $stderr.puts "Comparing #{s1 ? s1 : "nil"} with #{s2 ? s2 : "nil"}"
+matchups = re.matchups
+matchups.each_with_index do |s1,s2, i| 
+  $stderr.puts "Comparison #{i}/#{matchups.size}: #{s1 ? s1 : "nil"} with #{s2 ? s2 : "nil"}"
   Comparator.compare(s1, s2, sinfo1, sinfo2)
 end

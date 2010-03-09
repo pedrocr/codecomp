@@ -1,6 +1,6 @@
 class Util
-  def self.run_cmd(cmd, exit_on_error=true)
-    $stderr.puts "++ Running: #{cmd}"
+  def self.run_cmd(cmd, exit_on_error=true, verbose=false)
+    $stderr.puts "++ Running: #{cmd}" if verbose
     r = system(cmd)
     if !r
       $stderr.puts "-- Error Running Command: #{cmd}" 
