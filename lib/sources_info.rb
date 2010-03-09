@@ -162,8 +162,10 @@ class SourcePkg
     origdir = @orig.filename.sub(".tar.gz", "")
     FileUtils.mkdir tmpdir = dest_dir+"/"+origdir+"-"+distname+".tmpdir"
     Util.run_cmd "tar -C #{tmpdir} -zxpf #{origfile}"
-    newdir = Dir.entries(tmpdir).find{|d| d != "." && d != ".."}
-    tardir = tmpdir+"/"+newdir
+    newentries = Dir.entries(tmpdir)
+    tardir = tmpdir
+    # Sometimes packages don't unpack into a new folder (newentries.size > 3)
+    tardir += "/"+newentries.find{|d| d != "." && d != ".."} if newentries.size <= 3
 
     #Apply the diff if it exists
     Util.run_cmd "zcat #{difffile} | patch -s -p1 -d #{tardir}" if @diff
@@ -188,7 +190,7 @@ class SourcePkg
     #Move directory into its final naming
     finaldir = dest_dir+"/"+origdir+"-"+distname
     FileUtils.mv(tardir, finaldir)
-    FileUtils.rmdir tmpdir
+    FileUtils.rmdir tmpdir if File.exists? tmpdir
     finaldir
   end
 
