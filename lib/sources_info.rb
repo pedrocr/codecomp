@@ -171,12 +171,16 @@ class SourcePkg
     #Remove all non-source files
     extensions = SOURCE_EXTS+SOURCE_EXTS.map{|e| e.upcase}
     ext_cond = extensions.map{|e| "-not -name \"*.#{e}\""}.join(" ")
+    
     delete_files = File.open("#{tardir}/deleted_files", "w")
-    IO.popen("find #{tardir} -type l && find #{tardir} #{ext_cond} -not -type d").each do |line|
-      line = line.strip
-      if not line.endswith? "deleted_files"
-        delete_files.puts line
-        FileUtils.rm line
+    ["find #{tardir} -type l",
+     "find #{tardir} #{ext_cond} -not -type d"].each do |cmd|
+      IO.popen(cmd).each do |line|
+        line = line.strip
+        if not line.endswith? "deleted_files"
+          delete_files.puts line
+          FileUtils.rm line
+        end
       end
     end
     delete_files.close
