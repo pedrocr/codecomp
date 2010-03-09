@@ -92,7 +92,7 @@ class SourcesInfo
         @PackageToFile[currpkg] = fileobj ||= SourcePkg.new(currpkg, dir)
         md5, size, filename = line.split
         finfo = FileInfo.new(filename, md5, size)
-        fileobj.orig = finfo if line.strip.endswith? ".orig.tar.gz"
+        fileobj.orig = finfo if line.strip.endswith? ".tar.gz"
         fileobj.diff = finfo if line.strip.endswith? ".diff.gz"
         fileobj.dsc = finfo if line.strip.endswith? ".dsc"
       elsif line.startswith? "Package:"
@@ -154,7 +154,7 @@ class SourcePkg
 
   def download(distname, dest_dir=".")
     origfile = get_from_archive(@orig)
-    difffile = get_from_archive(@diff)
+    difffile = get_from_archive(@diff) if @diff
   
     #Unpack the original file
     origdir = @orig.filename[0...-".orig.tar.gz".size]
@@ -163,9 +163,8 @@ class SourcePkg
     newdir = Dir.entries(tmpdir).find{|d| d != "." && d != ".."}
     tardir = tmpdir+"/"+newdir
 
-    #Apply the diff
-    Util.run_cmd "zcat #{difffile} | patch -s -p1 -d #{tardir}"
-    finaldir = dest_dir+"/"+origdir+"-"+distname
+    #Apply the diff if it exists
+    Util.run_cmd "zcat #{difffile} | patch -s -p1 -d #{tardir}" if @diff
 
     #Remove all non-source files
     extensions = SOURCE_EXTS+SOURCE_EXTS.map{|e| e.upcase}
@@ -173,12 +172,15 @@ class SourcePkg
     delete_files = File.open("#{tardir}/deleted_files", "w")
     IO.popen("find #{tardir} #{ext_cond} -type f").each do |line|
       line = line.strip
-      delete_files.puts line
-      FileUtils.rm line
+      if not line.endswith? "deleted_files"
+        delete_files.puts line
+        FileUtils.rm line
+      end
     end
     delete_files.close
 
     #Move directory into its final naming
+    finaldir = dest_dir+"/"+origdir+"-"+distname
     FileUtils.mv(tardir, finaldir)
     FileUtils.rmdir tmpdir
     finaldir
