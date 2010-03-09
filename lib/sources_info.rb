@@ -172,7 +172,7 @@ class SourcePkg
     extensions = SOURCE_EXTS+SOURCE_EXTS.map{|e| e.upcase}
     ext_cond = extensions.map{|e| "-not -name \"*.#{e}\""}.join(" ")
     delete_files = File.open("#{tardir}/deleted_files", "w")
-    IO.popen("find #{tardir} #{ext_cond} -type f").each do |line|
+    IO.popen("find #{tardir} #{ext_cond} -not -type d").each do |line|
       line = line.strip
       if not line.endswith? "deleted_files"
         delete_files.puts line
