@@ -1,6 +1,10 @@
 class Util
-  def self.run_cmd(cmd, exit_on_error=true, verbose=false)
-    $stderr.puts "++ Running: #{cmd}" if verbose
+  @@warnings = 0
+  @@errors = 0
+  @@verbose = false
+
+  def self.run_cmd(cmd, exit_on_error=true)
+    $stderr.puts "++ Running: #{cmd}" if @@verbose
     r = system(cmd)
     if !r
       $stderr.puts "-- Error Running Command: #{cmd}" 
@@ -21,4 +25,22 @@ class Util
     end.join("")
     not Regexp.new("^"+expr+"$").match(name).nil?
   end
+
+  def self.info(message)
+    $stderr.puts "Info: #{message}" if @@verbose
+  end
+
+  def self.warn(message)
+    $stderr.puts "Warning: #{message}" if @@verbose
+    @@warnings += 1
+  end
+  def self.warnings; @@warnings; end
+
+  def self.error(message)
+    $stderr.puts "ERROR: #{message}"
+    @@errors += 1
+  end
+  def self.errors; @@errors; end
+
+  def self.verbose; @@verbose; end
 end

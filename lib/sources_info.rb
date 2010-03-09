@@ -150,6 +150,8 @@ class SourcePkg
     @package = package
     @directory = dir
     @pkgcache = pkgcache
+    @orig = nil
+    @diff = nil
   end
 
   def download(distname, dest_dir=".")
@@ -200,16 +202,22 @@ class Archive
   def self.get(url, filename)
     #FIXME Check md5 if it already exists and at the end
     FileUtils.mkdir_p(CACHE_DIR)
-    fullpath = CACHE_DIR+"/"+filename
-    if File.exists? fullpath
-      $stderr.puts "#{filename} already in cache"
+    finalpath = CACHE_DIR+"/"+filename
+    if File.exists? finalpath
+      Util.info "#{filename} already in cache"
     else
-      cmd = "curl -o #{fullpath} #{BASE_URL}/#{url}"  
+      $stderr.puts "   Downloading #{filename}"
+      tmpdir = Dir.tmpdir+"/ubuntu_evolution-"+Process.pid.to_s
+      FileUtils.mkdir_p tmpdir
+      fullpath = tmpdir+"/"+filename
+      cmd = "curl #{Util.verbose ? '-#' : '-s'} -o #{fullpath} #{BASE_URL}/#{url}"  
       while !Util.run_cmd(cmd, false)
         $stderr.puts "Trying again in #{NSEC_RETRY} seconds"
         sleep NSEC_RETRY
       end
+      FileUtils.mv fullpath, finalpath
+      FileUtils.rmdir tmpdir
     end
-    fullpath
+    finalpath
   end
 end

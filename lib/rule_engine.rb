@@ -1,6 +1,4 @@
 class RuleEngine
-  attr_reader :warnings, :errors
-
   def initialize(sinfo1, sinfo2)
     @sinfo1 = sinfo1
     @sinfo2 = sinfo2
@@ -11,8 +9,6 @@ class RuleEngine
     @same_srcs = {}
 
     @matchup_pairs = {}
-    @warnings = 0
-    @errors = 0
 
     filename = File.dirname(__FILE__)+"/../rules/#{sinfo1.distro}_#{sinfo2.distro}.rules"
     self.instance_eval(File.read(filename),filename)
@@ -50,16 +46,6 @@ class RuleEngine
 
   def clear_matchups
     @matchup_pairs = {}
-  end
-
-  def warn(message)
-    $stderr.puts "Warning: #{message}"
-    @warnings += 1
-  end
-
-  def error(message)
-    $stderr.puts "ERROR: #{message}"
-    @errors += 1
   end
 
   def find_ignore_bin_match(bin)
@@ -101,7 +87,7 @@ class RuleEngine
       elsif newsb2 = sb1.find_correspondent(@sinfo2)
         add_matchup(sb1, newsb2)
       else
-        error "#{bin}: #{sb1} doesn't exist in #{dist2}, removed?"
+        Util.error "#{bin}: #{sb1} doesn't exist in #{dist2}, removed?"
       end
     elsif !sb1 and sb2
       if newsb1 = sb2.find_correspondent(@sinfo1)
@@ -110,10 +96,10 @@ class RuleEngine
       elsif added_in? sb2, dist2
         add_matchup(nil, sb2)
       else
-        error "#{bin}: #{sb2} doesn't exist in #{dist1}, added?"
+        Util.error "#{bin}: #{sb2} doesn't exist in #{dist1}, added?"
       end
     elsif !sb1 and !sb2
-      warn "Package #{bin} doesn't exist in #{dist1} or #{dist2}, ignoring"
+      Util.warn "Package #{bin} doesn't exist in #{dist1} or #{dist2}, ignoring"
     elsif sb1 == sb2 
       #Normal case
       add_matchup(sb1, sb2) 
@@ -127,7 +113,7 @@ class RuleEngine
         #For binaries that are moved into a new source
         add_matchup(sb1, newsb2) if newsb2 = sb1.find_correspondent(@sinfo2)
       else
-        warn "#{bin}: Source packages for #{bin} differ (#{sb1} in #{dist1}|#{sb2} in #{dist2}), comparing anyway"
+        Util.warn "#{bin}: Source packages for #{bin} differ (#{sb1} in #{dist1}|#{sb2} in #{dist2}), comparing anyway"
         add_matchup(sb1, sb2)
       end
     else
