@@ -10,14 +10,16 @@ class DummyFile
 end
 
 class Comparator
-  def self.compare(pkg1, pkg2, sources1, sources2, basedir=File.dirname(__FILE__)+"/../comparisons/")
+  def self.compare(pkg1, pkg2, sources1, sources2, 
+                   basetmpdir=File.dirname(__FILE__)+"/../tmpdir/", 
+                   resultsdir=File.dirname(__FILE__)+"/../comparisons/")
     pkgname = (pkg1 ? pkg1 : "nil")+"#"+(pkg2 ? pkg2 : "nil")
-    tmpdir = basedir+"/"+pkgname
-    if File.exists? tmpdir
-      $stderr.puts "Warning: #{tmpdir} already exists, skipping comparison"
+    resultfile = resultsdir+"/"+pkgname
+    if File.exists? resultfile
+      $stderr.puts "Warning: #{resultfile} already exists, skipping comparison"
     else
-      FileUtils.mkdir_p tmpdir
-      resultfile = tmpdir+"/results"
+      FileUtils.mkdir_p resultsdir
+      FileUtils.mkdir_p tmpdir = basetmpdir+"/"+pkgname
       file1 = pkg1 ? sources1.package_to_file(pkg1) : DummyFile.new
       file2 = pkg2 ? sources2.package_to_file(pkg2) : DummyFile.new
       dir1 = file1.download(sources1.distro, tmpdir)
