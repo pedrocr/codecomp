@@ -1,0 +1,25 @@
+#!/usr/bin/env ruby
+$-w = true
+#require File.dirname(__FILE__)+"/../lib/all"
+
+def read_loc(str)
+  str.strip!
+  str.split(" ")[-1].to_i
+end
+
+def read_diffstat(str, pattern)
+  match = str.match(Regexp.new("(\\d*) "+pattern))
+  match ? match[1].to_i : 0
+end
+
+puts ['from', 'to', 'from_loc', 'to_loc', 'files_changed', 'insertions', 'deletions'].join(',')
+Dir.glob(File.dirname(__FILE__)+"/../comparisons/*") do |filename|
+  from,to = File.basename(filename).split("#")
+  content = File.open(filename).readlines
+  from_loc = read_loc(content[0])
+  to_loc = read_loc(content[1])
+  files_changed = read_diffstat(content[2], "files changed")
+  insertions = read_diffstat(content[2], "insertions")
+  deletions = read_diffstat(content[2], "deletions")
+  puts [from, to, from_loc, to_loc, files_changed, insertions, deletions].join(',')
+end
