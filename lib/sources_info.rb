@@ -92,9 +92,13 @@ class SourcesInfo
         @PackageToFile[currpkg] = fileobj ||= SourcePkg.new(currpkg, dir)
         md5, size, filename = line.split
         finfo = FileInfo.new(filename, md5, size)
-        fileobj.orig = finfo if line.strip.endswith? ".tar.gz"
-        fileobj.diff = finfo if line.strip.endswith? ".diff.gz"
-        fileobj.dsc = finfo if line.strip.endswith? ".dsc"
+        if line.strip.endswith? ".orig.tar.gz" or line.strip.endswith? ".orig.tar.bz2"
+          fileobj.orig = finfo
+        elsif line.strip.endswith? ".diff.gz" or line.strip.endswith? ".diff.bz2"
+          fileobj.diff = finfo
+        elsif line.strip.endswith? ".dsc"
+          fileobj.dsc = finfo 
+        end
       elsif line.startswith? "Package:"
         currpkg = line.split[1]
       elsif line.startswith? "Binary:"
@@ -155,13 +159,21 @@ class SourcePkg
   end
 
   def download(distname, dest_dir=".")
+    Util.fatal_error "No source file for #{@package} in #{distname}" if !@orig
     origfile = get_from_archive(@orig)
     difffile = get_from_archive(@diff) if @diff
-  
+    if @orig.filename.endswith? ".gz"
+      dflag = 'z'
+    elsif @orig.filename.endswith? ".bz2"
+      dflag = 'j'
+    else
+      Util.fatal_error "Unknown compressed file type #{@orig}"
+    end
+
     #Unpack the original file
-    origdir = @orig.filename.sub(".tar.gz", "")
+    origdir = @orig.filename.sub(".tar.gz", "").sub(".tar.bz2", "")
     FileUtils.mkdir tmpdir = dest_dir+"/"+origdir+"-"+distname+".tmpdir"
-    Util.run_cmd "tar -C #{tmpdir} -zxpf #{origfile}"
+    Util.run_cmd "tar -C #{tmpdir} -#{dflag}xpf #{origfile}"
     newentries = Dir.entries(tmpdir)
     tardir = tmpdir
     # Sometimes packages don't unpack into a new folder (newentries.size > 3)

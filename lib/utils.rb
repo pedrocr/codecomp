@@ -40,6 +40,11 @@ class Util
     $stderr.puts "ERROR: #{message}"
     @@errors += 1
   end
+  def self.fatal_error(message)
+    $stderr.puts "FATAL ERROR: #{message}"
+    exit 2
+  end
+
   def self.errors; @@errors; end
 
   def self.verbose; @@verbose; end
