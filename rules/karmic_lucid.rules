@@ -5,6 +5,7 @@ include_src "software-center"
 same_src "wacom-tools", "xf86-input-wacom"
 same_src "update-notifier-kde", "kubuntu-notification-helper"
 same_src "phonon", "phonon-backends"
+same_src "wine", "wine1.2"
 
 deleted_in "lucid", "python2.5"
 deleted_in "lucid", "sun-java6"

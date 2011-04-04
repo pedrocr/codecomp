@@ -1,3 +1,4 @@
+ignore_bin "wine1.2"
 # Deletion and addition of whole source packages
 deleted_in "karmic", "mktemp"
 deleted_in "karmic", "scrollkeeper"
