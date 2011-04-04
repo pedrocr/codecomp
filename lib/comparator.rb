@@ -10,9 +10,9 @@ class DummyFile
 end
 
 class Comparator
-  def self.compare(pkg1, pkg2, sources1, sources2, 
-                   basetmpdir=File.dirname(__FILE__)+"/../tmpdir/", 
-                   resultsdir=File.dirname(__FILE__)+"/../comparisons/")
+  def self.compare(pkg1, pkg2, sources1, sources2, basetmpdir=nil, resultsdir=nil)
+    basetmpdir ||= File.dirname(__FILE__)+"/../tmpdir/"
+    resultsdir ||= File.dirname(__FILE__)+"/../comparisons/#{sources1.distro}_#{sources2.distro}"
     pkgname = (pkg1 ? pkg1 : "nil")+"#"+(pkg2 ? pkg2 : "nil")
     resultfile = resultsdir+"/"+pkgname
     if File.exists? resultfile
