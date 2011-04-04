@@ -21,8 +21,8 @@ bins = File.new(ARGV[0]).map {|line| pkg, number = line.split; pkg}
 re.process(bins)
 
 $stderr.puts "Finished determining package matchups, #{Util.errors} errors and #{Util.warnings} warnings"
-if Util.errors > 0
-  $stderr.puts "Aborting due to errors in package matchups, correct those to advance"
+if Util.errors > 0 || Util.warnings > 0
+  $stderr.puts "Aborting due to errors or warnings in package matchups, correct those to advance"
   exit 1
 end
 $stderr.puts "Success!! Proceeding with comparison"

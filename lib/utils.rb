@@ -1,7 +1,7 @@
 class Util
   @@warnings = 0
   @@errors = 0
-  @@verbose = false
+  @@verbose = true
 
   def self.run_cmd(cmd, exit_on_error=true)
     $stderr.puts "++ Running: #{cmd}" if @@verbose

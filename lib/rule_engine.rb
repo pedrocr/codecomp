@@ -104,7 +104,7 @@ class RuleEngine
         Util.error "#{bin}: #{sb2} doesn't exist in #{dist1}, added?"
       end
     elsif !sb1 and !sb2
-      Util.warn "Package #{bin} doesn't exist in #{dist1} or #{dist2}, ignoring"
+      #Util.warn "Package #{bin} doesn't exist in #{dist1} or #{dist2}, ignoring"
     elsif sb1 == sb2 
       #Normal case
       add_matchup(sb1, sb2) 

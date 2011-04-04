@@ -1,5 +1,5 @@
 # Binary packages that should be collapsed into a single comparison
-same_src "firefox-*"
+same_src "firefox", "firefox-*"
 same_src "gcc-*"
 same_src "gcj-*"
 same_src "readline?"
@@ -11,6 +11,12 @@ same_src "ffmpeg-debian", "ffmpeg"
 same_src "wxwindows*", "wxwidgets*"
 same_src "mysql-dfsg-*"
 same_src "postgresql-*"
+same_src "gnome-keyring", "libgnome-keyring"
+same_src "db", "db4.7", "db4.8"
+same_src "wine", "wine1.2"
+same_src "clutter-gtk", "clutter-gtk-*"
+same_src "kdebluetooth", "kbluetooth"
+
 
 # Binary packages that are not in Ubuntu
 ignore_bin "googleearth"
