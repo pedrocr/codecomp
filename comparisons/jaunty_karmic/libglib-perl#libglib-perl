@@ -1,0 +1,3 @@
+From: libglib-perl WithLOC: 13906  
+To: libglib-perl WithLOC: 15317  
+Differences:  20 files changed, 1819 insertions(+), 408 deletions(-)

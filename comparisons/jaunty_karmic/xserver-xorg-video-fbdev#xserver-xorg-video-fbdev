@@ -1,0 +1,3 @@
+From: xserver-xorg-video-fbdev WithLOC: 9181  
+To: xserver-xorg-video-fbdev WithLOC: 9147  
+Differences:  3 files changed, 60 insertions(+), 94 deletions(-)

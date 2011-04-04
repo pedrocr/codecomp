@@ -1,0 +1,3 @@
+From: mpfr WithLOC: 100889  
+To: mpfr WithLOC: 100969  
+Differences:  14 files changed, 203 insertions(+), 123 deletions(-)

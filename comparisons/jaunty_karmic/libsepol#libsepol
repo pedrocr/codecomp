@@ -1,0 +1,3 @@
+From: libsepol WithLOC: 28605  
+To: libsepol WithLOC: 29016  
+Differences:  10 files changed, 762 insertions(+), 351 deletions(-)

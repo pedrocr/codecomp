@@ -1,0 +1,3 @@
+From: xserver-xorg-input-keyboard WithLOC: 14620  
+To: xserver-xorg-input-keyboard WithLOC: 14546  
+Differences:  6 files changed, 83 insertions(+), 157 deletions(-)

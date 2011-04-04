@@ -1,0 +1,3 @@
+From: gstreamer0.10-ffmpeg WithLOC: 424537  
+To: gstreamer0.10-ffmpeg WithLOC: 426446  
+Differences:  43 files changed, 3790 insertions(+), 1881 deletions(-)

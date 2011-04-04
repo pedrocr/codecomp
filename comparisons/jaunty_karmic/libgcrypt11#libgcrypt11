@@ -1,0 +1,3 @@
+From: libgcrypt11 WithLOC: 83968  
+To: libgcrypt11 WithLOC: 98657  
+Differences:  84 files changed, 21355 insertions(+), 6666 deletions(-)

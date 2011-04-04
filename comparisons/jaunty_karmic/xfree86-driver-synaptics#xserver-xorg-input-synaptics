@@ -1,0 +1,3 @@
+From: xfree86-driver-synaptics WithLOC: 14638  
+To: xserver-xorg-input-synaptics WithLOC: 8713  
+Differences:  24 files changed, 1827 insertions(+), 7752 deletions(-)
