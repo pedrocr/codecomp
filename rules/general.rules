@@ -19,7 +19,7 @@ same_src "wine", "wine1.2"
 
 # Binary packages that are not in Ubuntu
 ignore_bin "googleearth"
-ignore_bin "virtualbox-*"
+ignore_bin "virtualbox-3*", "virtualbox-4*"
 ignore_bin "adobe-flashplugin"
 ignore_bin "skype"
 ignore_bin "opera"
