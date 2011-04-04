@@ -92,7 +92,9 @@ class SourcesInfo
         @PackageToFile[currpkg] = fileobj ||= SourcePkg.new(currpkg, dir)
         md5, size, filename = line.split
         finfo = FileInfo.new(filename, md5, size)
-        if line.strip.endswith? ".orig.tar.gz" or line.strip.endswith? ".orig.tar.bz2"
+        l = line.strip
+        if (l.endswith? ".tar.gz" and !l.endswith? ".debian.tar.gz") or 
+           (l.endswith? ".tar.bz2" and !l.endswith? ".debian.tar.bz2")
           fileobj.orig = finfo
         elsif line.strip.endswith? ".diff.gz" or line.strip.endswith? ".diff.bz2"
           fileobj.diff = finfo
@@ -180,7 +182,16 @@ class SourcePkg
     tardir += "/"+newentries.find{|d| d != "." && d != ".."} if newentries.size <= 3
 
     #Apply the diff if it exists
-    Util.run_cmd "zcat #{difffile} | patch -s -p1 -d #{tardir}" if @diff
+    if @diff
+      if @diff.filename.endswith? ".gz"
+        cat = 'zcat'
+      elsif @orig.filename.endswith? ".bz2"
+        cat = 'bzcat'
+      else
+        Util.fatal_error "Unknown compressed file type #{@diff}"
+      end
+      Util.run_cmd "#{cat} #{difffile} | patch -s -p1 -d #{tardir}"
+    end
 
     #Remove all non-source files
     extensions = SOURCE_EXTS+SOURCE_EXTS.map{|e| e.upcase}
