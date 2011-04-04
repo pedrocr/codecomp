@@ -10,7 +10,12 @@ class RuleEngine
 
     @matchup_pairs = {}
 
-    filename = File.dirname(__FILE__)+"/../rules/#{sinfo1.distro}_#{sinfo2.distro}.rules"
+    eval_rules "general"
+    eval_rules "#{sinfo1.distro}_#{sinfo2.distro}"
+  end
+
+  def eval_rules(name)
+    filename = File.dirname(__FILE__)+"/../rules/#{name}.rules"
     self.instance_eval(File.read(filename),filename)
   end
 
