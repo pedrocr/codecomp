@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# Test comparisons between two packages
+
 $-w = true
 require File.dirname(__FILE__)+"/../lib/all"
 
@@ -7,7 +9,7 @@ require "sources_info"
 require "comparator"
 
 if ARGV.size != 4
-  $stderr.puts "Usage: ProcessSources <Package1> <Package2> <Distro1> <Distro2>"
+  $stderr.puts "Usage: TestComparisons <Package1> <Package2> <Distro1> <Distro2>"
   exit(1)
 end
 

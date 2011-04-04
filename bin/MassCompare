@@ -1,9 +1,11 @@
 #!/usr/bin/env ruby
+# Take a package list and two ubuntu code names and generate the comparisons
+
 $-w = true
 require File.dirname(__FILE__)+"/../lib/all"
 
 if ARGV.size != 3
-  $stderr.puts "Usage: ProcessSources <PkgList> <Distro1> <Distro2>"
+  $stderr.puts "Usage: MassCompare <PkgList> <Distro1> <Distro2>"
   exit 1
 end
 
@@ -23,8 +25,8 @@ if Util.errors > 0
   $stderr.puts "Aborting due to errors in package matchups, correct those to advance"
   exit 1
 end
-
 $stderr.puts "Success!! Proceeding with comparison"
+
 matchups = re.matchups
 matchups.each_with_index do |match, i|
   s1, s2 = match 

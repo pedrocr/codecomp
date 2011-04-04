@@ -1,4 +1,6 @@
 #!/usr/bin/env ruby
+# Process the popularity contest results to select the N most popular ones
+
 $-w = true
 require File.dirname(__FILE__)+"/../lib/all"
 
