@@ -1,54 +1,3 @@
-# Binary packages that should be collapsed into a single comparison
-same_src "firefox-*"
-same_src "gcc-*"
-same_src "gcj-*"
-same_src "readline?"
-same_src "glibc", "eglibc"
-same_src "xulrunner-*"
-same_src "telepathy-mission-control", "telepathy-mission-control-*"
-same_src "xfree86-driver-synaptics", "xserver-xorg-input-synaptics"
-same_src "ffmpeg-debian", "ffmpeg"
-same_src "wxwindows*", "wxwidgets*"
-same_src "mysql-dfsg-*"
-same_src "postgresql-*"
-
-# Binary packages that are not in Ubuntu
-ignore_bin "googleearth"
-ignore_bin "virtualbox-3.1"
-ignore_bin "adobe-flashplugin"
-ignore_bin "skype"
-ignore_bin "opera"
-ignore_bin "acroread"
-ignore_bin "wine1.2"
-ignore_bin "nautilus-dropbox"
-ignore_bin "linux-libc-dev"
-ignore_bin "nvidia-*"
-ignore_bin "google-chrome-beta"
-ignore_bin "picasa"
-ignore_bin "w32codecs"
-
-# Binary packages that don't exist in either distro or throw spurious warnings
-ignore_bin "mono-git"
-ignore_bin "linux-restricted-modules-common"
-ignore_bin "ureadahead"
-ignore_bin "libstdc++6-4.4-dev"
-ignore_bin "dhcdbd"
-ignore_bin "libbluetooth2"
-ignore_bin "bluez-audio"
-ignore_bin "gtkhtml3.14"
-ignore_bin "belocs-locales-bin"
-
-# Source for the libraries is now util-linux but these are not the same source
-ignore_bin "libblkid1", "libuuid1", "uuid-runtime"
-include_src "e2fsprogs"
-include_src "util-linux"
-include_src "coreutils"
-
-# Ignore all kernel binaries, add "linux" src package to represent the latest one
-ignore_bin "linux-image-*-generic"
-ignore_bin "linux-headers-*"
-include_src "linux"
-
 # Deletion and addition of whole source packages
 deleted_in "karmic", "mktemp"
 deleted_in "karmic", "scrollkeeper"
@@ -91,5 +40,3 @@ added_in "karmic", "gdata-sharp"
 added_in "karmic", "gnome-do-docklets"
 added_in "karmic", "liblouis"
 added_in "karmic", "libio-compress-perl"
-
- 
