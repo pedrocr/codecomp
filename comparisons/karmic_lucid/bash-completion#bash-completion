@@ -1,0 +1,3 @@
+From: bash-completion WithLOC: 275  
+To: bash-completion WithLOC: 481  
+Differences:  12 files changed, 481 insertions(+), 275 deletions(-)

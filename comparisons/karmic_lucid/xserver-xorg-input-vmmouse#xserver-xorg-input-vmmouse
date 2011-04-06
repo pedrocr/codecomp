@@ -1,0 +1,3 @@
+From: xserver-xorg-input-vmmouse WithLOC: 10182  
+To: xserver-xorg-input-vmmouse WithLOC: 9942  
+Differences:  4 files changed, 131 insertions(+), 371 deletions(-)

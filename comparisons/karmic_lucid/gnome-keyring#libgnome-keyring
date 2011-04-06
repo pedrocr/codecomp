@@ -1,0 +1,3 @@
+From: gnome-keyring WithLOC: 227824  
+To: libgnome-keyring WithLOC: 29631  
+Differences:  501 files changed, 10711 insertions(+), 208893 deletions(-)

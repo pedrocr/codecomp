@@ -1,0 +1,3 @@
+From: wacom-tools WithLOC: 80533  
+To: xf86-input-wacom WithLOC: 19961  
+Differences:  129 files changed, 19340 insertions(+), 79912 deletions(-)

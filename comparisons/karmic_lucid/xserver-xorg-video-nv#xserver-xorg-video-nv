@@ -1,0 +1,3 @@
+From: xserver-xorg-video-nv WithLOC: 40514  
+To: xserver-xorg-video-nv WithLOC: 40276  
+Differences:  18 files changed, 138 insertions(+), 376 deletions(-)

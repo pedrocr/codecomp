@@ -1,0 +1,3 @@
+From: xserver-xorg-video-intel WithLOC: 84994  
+To: xserver-xorg-video-intel WithLOC: 85571  
+Differences:  25 files changed, 1799 insertions(+), 1222 deletions(-)
