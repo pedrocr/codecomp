@@ -29,8 +29,11 @@ class RuleEngine
     @ignore_bins += bins.unshift(bin1)
   end
 
-  def include_src(src1, *srcs)
-    @include_srcs += srcs.unshift(src1)
+  #FIXME: Find a way to go from src to bin and find the votes so as to not have
+  #       to specify it here
+  def include_src(src, votes)
+    $stderr.puts "Adding #{src} with #{votes} votes"
+    @include_srcs << [src, votes]
   end
 
   def deleted_in(dist, src)
@@ -41,12 +44,15 @@ class RuleEngine
     @added_in[src] = dist
   end
 
-  def add_matchup(sb1, sb2)
-    @matchup_pairs[[sb1,sb2]] = true
+  def add_matchup(sb1, sb2, votes)
+    @matchup_pairs[[sb1,sb2]] = votes
   end
 
   def matchups
-    @matchup_pairs.keys.map{|sb1, sb2| [sb1 ? sb1.pkg : nil, sb2 ? sb2.pkg : nil]}
+    @matchup_pairs.map do |key, votes| 
+      sb1, sb2 = key
+      [sb1 ? sb1.pkg : nil, sb2 ? sb2.pkg : nil, votes]
+    end
   end
 
   def clear_matchups
@@ -60,15 +66,17 @@ class RuleEngine
   def process(bins)
     dist1 = @sinfo1.distro
     dist2 = @sinfo2.distro
-    bins.each do |bin|
+    bins.each do |bin, votes|
       if not find_ignore_bin_match(bin)
         bundle1 = @sinfo1.bin_to_bundle(bin)
         bundle2 = @sinfo2.bin_to_bundle(bin)
-        process_bundles(bin, bundle1, bundle2)
+        process_bundles(bin, bundle1, bundle2, votes)
       end
     end
-    @include_srcs.each do |src|
-      process_bundles(src, @sinfo1.src_to_bundle(src), @sinfo2.src_to_bundle(src))
+    @include_srcs.each do |is|
+      src, votes = is
+      $stderr.puts "Bundling #{src} with #{votes} votes"
+      process_bundles(src, @sinfo1.src_to_bundle(src), @sinfo2.src_to_bundle(src), votes)
     end
   end
 
@@ -83,23 +91,23 @@ class RuleEngine
   end
 
   # Given two source bundles from a given binary file generate the pairings
-  def process_bundles(bin, sb1, sb2)
+  def process_bundles(bin, sb1, sb2, votes)
     dist1 = @sinfo1.distro
     dist2 = @sinfo2.distro
     if sb1 and !sb2
       if deleted_in? sb1, dist2
-        add_matchup(sb1, nil)
+        add_matchup(sb1, nil, votes)
       elsif newsb2 = sb1.find_correspondent(@sinfo2)
-        add_matchup(sb1, newsb2)
+        add_matchup(sb1, newsb2, votes)
       else
         Util.error "#{bin}: #{sb1} doesn't exist in #{dist2}, removed?"
       end
     elsif !sb1 and sb2
       if newsb1 = sb2.find_correspondent(@sinfo1)
         # Must be an extra binary from the same source
-        add_matchup(newsb1, sb2)
+        add_matchup(newsb1, sb2, votes)
       elsif added_in? sb2, dist2
-        add_matchup(nil, sb2)
+        add_matchup(nil, sb2, votes)
       else
         Util.error "#{bin}: #{sb2} doesn't exist in #{dist1}, added?"
       end
@@ -107,19 +115,19 @@ class RuleEngine
       #Util.warn "Package #{bin} doesn't exist in #{dist1} or #{dist2}, ignoring"
     elsif sb1 == sb2 
       #Normal case
-      add_matchup(sb1, sb2) 
+      add_matchup(sb1, sb2, votes) 
     elsif sb1 != sb2
       if deleted_in? sb1, dist2
-        add_matchup(sb1, nil)
+        add_matchup(sb1, nil, votes)
         #For binaries that are moved into an existing source
-        add_matchup(newsb1, sb2) if newsb1 = sb2.find_correspondent(@sinfo1)
+        add_matchup(newsb1, sb2, votes) if newsb1 = sb2.find_correspondent(@sinfo1)
       elsif added_in? sb2, dist2
-        add_matchup(nil, sb2)
+        add_matchup(nil, sb2, votes)
         #For binaries that are moved into a new source
-        add_matchup(sb1, newsb2) if newsb2 = sb1.find_correspondent(@sinfo2)
+        add_matchup(sb1, newsb2, votes) if newsb2 = sb1.find_correspondent(@sinfo2)
       else
         Util.warn "#{bin}: Source packages for #{bin} differ (#{sb1} in #{dist1}|#{sb2} in #{dist2}), comparing anyway"
-        add_matchup(sb1, sb2)
+        add_matchup(sb1, sb2, votes)
       end
     else
       puts "BUG IN process_bin parser in #{__FILE__}, this should not have happened!"

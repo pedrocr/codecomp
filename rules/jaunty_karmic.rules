@@ -5,7 +5,7 @@ deleted_in "karmic", "scrollkeeper"
 deleted_in "karmic", "zope3"
 deleted_in "karmic", "hotkey-setup"
 deleted_in "karmic", "fast-user-switch-applet"
-include_src "rarian"
+include_src "rarian", 99274
 added_in "karmic", "ibus-qt"
 added_in "karmic", "xsplash"
 added_in "karmic", "software-center"

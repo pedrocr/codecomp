@@ -17,7 +17,8 @@ sinfo1 = SourcesInfo.new(dist1)
 sinfo2 = SourcesInfo.new(dist2)
 re = RuleEngine.new(sinfo1, sinfo2)
 
-bins = File.new(ARGV[0]).map {|line| pkg, number = line.split; pkg}
+bins = {}
+File.new(ARGV[0]).each {|line| pkg, number = line.split; bins[pkg] = number}
 re.process(bins)
 
 $stderr.puts "Finished determining package matchups, #{Util.errors} errors and #{Util.warnings} warnings"
@@ -29,7 +30,8 @@ $stderr.puts "Success!! Proceeding with comparison"
 
 matchups = re.matchups
 matchups.each_with_index do |match, i|
-  s1, s2 = match 
+  s1, s2, votes = match
+  #puts "#{s1 ? s1 : "nil"}\##{s2 ? s2 : "nil"} #{votes}"
   $stderr.puts "Comparison #{i+1}/#{matchups.size}: #{s1 ? s1 : "nil"} with #{s2 ? s2 : "nil"}"
   Comparator.compare(s1, s2, sinfo1, sinfo2)
 end

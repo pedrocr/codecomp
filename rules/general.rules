@@ -44,13 +44,13 @@ ignore_bin "belocs-locales-bin"
 
 # Source for the libraries is now util-linux but these are not the same source
 ignore_bin "libblkid1", "libuuid1", "uuid-runtime"
-include_src "e2fsprogs"
-include_src "util-linux"
-include_src "coreutils"
+include_src "e2fsprogs", 84648
+include_src "util-linux", 167743
+include_src "coreutils", 195768
 
 # Ignore all kernel binaries, add "linux" src package to represent the latest one
 ignore_bin "linux-image-*-generic"
 ignore_bin "linux-headers-*"
-include_src "linux"
+include_src "linux", 253554
 
  
