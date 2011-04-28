@@ -1,3 +1,0 @@
-From: xserver-xorg-input-evdev WithLOC: 13684  
-To: xserver-xorg-input-evdev WithLOC: 13265  
-Differences:  18 files changed, 990 insertions(+), 1409 deletions(-)
