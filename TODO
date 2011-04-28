@@ -3,6 +3,6 @@ Code up the lucid-maverick comparison
 
 Short-Term
 
-Remove vote tracking code and replace with bin packages tracking code for each matchup so as to correctly account for multi-bin src comparisons
+Remove vote tracking code and replace with adding up the votes for all the bin packages of a given src package so as to correctly account for multi-bin src comparisons
 Obtain per-release or timeseries data on popularity
 Do a regression to explain popularity differences (ln(P2) = Rln(P1) + BX + E) where X is the amount of code differences
