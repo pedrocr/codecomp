@@ -1,10 +1,10 @@
 class Util
   @@warnings = 0
   @@errors = 0
-  @@verbose = false
+  @@verbose = 1
 
   def self.run_cmd(cmd, exit_on_error=true)
-    $stderr.puts "++ Running: #{cmd}" if @@verbose
+    $stderr.puts "++ Running: #{cmd}" if @@verbose >= 2
     r = system(cmd)
     if !r
       $stderr.puts "-- Error Running Command: #{cmd}" 
@@ -27,14 +27,13 @@ class Util
   end
 
   def self.info(message)
-    $stderr.puts "Info: #{message}" if @@verbose
+    $stderr.puts "Info: #{message}" if @@verbose >= 2
   end
 
   def self.warn(message)
-    $stderr.puts "Warning: #{message}" if @@verbose
+    $stderr.puts "Warning: #{message}" if @@verbose >= 1
     @@warnings += 1
   end
-  def self.warnings; @@warnings; end
 
   def self.error(message)
     $stderr.puts "ERROR: #{message}"
@@ -45,7 +44,7 @@ class Util
     exit 2
   end
 
+  def self.warnings; @@warnings; end
   def self.errors; @@errors; end
-
   def self.verbose; @@verbose; end
 end
