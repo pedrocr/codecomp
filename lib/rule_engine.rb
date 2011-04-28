@@ -13,11 +13,6 @@ class RuleEngine
     eval_rules "#{sinfo1.distro}_#{sinfo2.distro}"
   end
 
-  def eval_rules(name)
-    filename = File.dirname(__FILE__)+"/../rules/#{name}.rules"
-    self.instance_eval(File.read(filename),filename)
-  end
-
   def same_src(expr1, *exprs)
     exprs.unshift(expr1)
     @sinfo1.add_wildcard_bundle(exprs)
@@ -25,21 +20,8 @@ class RuleEngine
   end
 
   def ignore_src(src1, *srcs)
-    @ignore_srcs += srcs.unshift(src1)
-  end
-
-  #FIXME: Remove these
-  def ignore_bin(bin1, *bins)
-  end
-  def include_src(src, votes)
-  end
-  def deleted_in(dist, src)
-  end
-  def added_in(dist, src)
-  end
-
-  def add_matchup(sb1, sb2)
-    @matchup_pairs[[sb1,sb2]] = true
+    @sinfo1.ignore_srcs(srcs.unshift(src1))
+    @sinfo2.ignore_srcs(srcs.unshift(src1))
   end
 
   def matchups
@@ -53,18 +35,22 @@ class RuleEngine
     @matchup_pairs = {}
   end
 
-  def find_ignore_src_match(src)
-    @ignore_srcs.map{|e| Util.match_expansion(e, src)}.inject{|a,b| a or b}
-  end
-
   def process
     sbs = {}
     @sinfo1.bundles.each{|b| sbs[b.hash] ||= [nil,nil]; sbs[b.hash][0] = b}
     @sinfo2.bundles.each{|b| sbs[b.hash] ||= [nil,nil]; sbs[b.hash][1] = b}
     sbs.values.each do |b1, b2|
-      #if not find_ignore_src_match(bundle)
-        add_matchup(b1, b2) if (b1||b2)
-      #end
+      add_matchup(b1, b2) if (b1||b2)
     end
+  end
+
+  private
+  def add_matchup(sb1, sb2)
+    @matchup_pairs[[sb1,sb2]] = true
+  end
+  
+  def eval_rules(name)
+    filename = File.dirname(__FILE__)+"/../rules/#{name}.rules"
+    self.instance_eval(File.read(filename),filename)
   end
 end

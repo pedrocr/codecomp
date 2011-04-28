@@ -67,6 +67,7 @@ class SourcesInfo
     @PackageToFile = {}
     @simple_bundles = {}
     @wildcard_bundles = []
+    @ignore_srcs = []
     @distro = distro
 
     repos.each do |repo|
@@ -126,12 +127,20 @@ class SourcesInfo
     @wildcard_bundles << SourceBundle.new(self, :exprs=>exprs)
   end
 
+  def ignore_srcs(srcs)
+    @ignore_srcs += srcs
+  end
+
   def bin_to_bundle(bin)
     src_to_bundle(bin_to_package(bin))
   end
 
+  def find_ignore_src_match(src)
+    @ignore_srcs.map{|e| Util.match_expansion(e, src)}.inject{|a,b| a or b}
+  end
+
   def bundles
-    self.map {|src| src_to_bundle(src)}
+    self.map {|src| src_to_bundle(src) if !find_ignore_src_match(src)}
   end
 
   def src_to_bundle(src)

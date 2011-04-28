@@ -17,40 +17,4 @@ same_src "clutter-gtk", "clutter-gtk-*"
 same_src "kdebluetooth", "kbluetooth"
 same_src "wine", "wine1.2"
 
-# Binary packages that are not in Ubuntu
-ignore_bin "googleearth"
-ignore_bin "virtualbox-3*", "virtualbox-4*"
-ignore_bin "adobe-flashplugin"
-ignore_bin "skype"
-ignore_bin "opera"
-ignore_bin "acroread"
-ignore_bin "nautilus-dropbox"
-ignore_bin "linux-libc-dev"
-ignore_bin "nvidia-*"
-ignore_bin "google-chrome-*"
-ignore_bin "picasa"
-ignore_bin "w32codecs"
-
-# Binary packages that don't exist in either distro or throw spurious warnings
-ignore_bin "mono-git"
-ignore_bin "linux-restricted-modules-common"
-ignore_bin "ureadahead"
-ignore_bin "libstdc++6-4.4-dev"
-ignore_bin "dhcdbd"
-ignore_bin "libbluetooth2"
-ignore_bin "bluez-audio"
-ignore_bin "gtkhtml3.14"
-ignore_bin "belocs-locales-bin"
-
-# Source for the libraries is now util-linux but these are not the same source
-ignore_bin "libblkid1", "libuuid1", "uuid-runtime"
-include_src "e2fsprogs", 84648
-include_src "util-linux", 167743
-include_src "coreutils", 195768
-
-# Ignore all kernel binaries, add "linux" src package to represent the latest one
-ignore_bin "linux-image-*-generic"
-ignore_bin "linux-headers-*"
-include_src "linux", 253554
-
  
