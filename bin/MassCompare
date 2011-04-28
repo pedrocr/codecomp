@@ -28,8 +28,6 @@ $stderr.puts "Success!! Proceeding with comparison"
 matchups = re.matchups
 matchups.each_with_index do |match, i|
   s1, s2 = match
-  #puts "#{s1 ? s1 : "nil"}\##{s2 ? s2 : "nil"} #{votes}"
-  $stderr.puts "#{s1 ? s1 : "nil"}\##{s2 ? s2 : "nil"}"
-#  $stderr.puts "Comparison #{i+1}/#{matchups.size}: #{s1 ? s1 : "nil"} with #{s2 ? s2 : "nil"}"
-#  Comparator.compare(s1, s2, sinfo1, sinfo2)
+  $stderr.puts "Comparison #{i+1}/#{matchups.size}: #{s1 ? s1 : "nil"} with #{s2 ? s2 : "nil"}"
+  Comparator.compare(s1, s2, sinfo1, sinfo2)
 end
