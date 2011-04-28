@@ -17,4 +17,6 @@ same_src "clutter-gtk", "clutter-gtk-*"
 same_src "kdebluetooth", "kbluetooth"
 same_src "wine", "wine1.2"
 
+ignore_src "iso-codes"
+
  
