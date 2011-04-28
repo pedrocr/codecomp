@@ -8,20 +8,6 @@ class SourcesBundleTest < Test::Unit::TestCase
     @jaunty ||= SourcesInfo.new("jaunty")
     @karmic ||= SourcesInfo.new("karmic")
   end
-  
-#  def test_comparisons_exprs
-#    bundle1 = SourceBundle.new(@jaunty, :exprs => ["glibc","eglibc"])
-#    bundle2 = SourceBundle.new(@karmic, :exprs => ["glibc","eglibc"])
-#    assert(bundle1 == bundle2, "#{bundle1} != #{bundle2}")
-#    assert(bundle1.hash == bundle2.hash, "#{bundle1} != #{bundle2}")
-#  end
-
-#  def test_comparisons_src
-#    bundle1 = SourceBundle.new(@jaunty, :src => "texinfo")
-#    bundle2 = SourceBundle.new(@karmic, :src => "texinfo")
-#    assert(bundle1 == bundle2, "#{bundle1} != #{bundle2}")
-#    assert(bundle1.hash == bundle2.hash, "#{bundle1} != #{bundle2}")
-#  end
 
   def test_double_comparisons_exprs
     bundle1a = SourceBundle.new(@jaunty, :exprs => ["glibc","eglibc"])
