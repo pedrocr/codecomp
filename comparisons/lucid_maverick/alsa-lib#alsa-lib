@@ -1,0 +1,3 @@
+From: alsa-lib WithLOC: 198718  
+To: alsa-lib WithLOC: 111643  
+Differences:  30 files changed, 365 insertions(+), 87440 deletions(-)

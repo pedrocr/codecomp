@@ -1,0 +1,3 @@
+From: zope.interface WithLOC: 13097  
+To: zope.interface WithLOC: 13502  
+Differences:  48 files changed, 867 insertions(+), 460 deletions(-)

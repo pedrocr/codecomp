@@ -1,0 +1,3 @@
+From: openoffice.org WithLOC: 15  
+To: openoffice.org WithLOC: 13  
+Differences:  1 file changed, 13 insertions(+), 15 deletions(-)

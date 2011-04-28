@@ -1,0 +1,3 @@
+From: gobject-introspection WithLOC: 48480  
+To: gobject-introspection WithLOC: 70066  
+Differences:  129 files changed, 31907 insertions(+), 10289 deletions(-)

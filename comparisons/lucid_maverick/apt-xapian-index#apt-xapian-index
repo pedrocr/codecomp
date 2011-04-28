@@ -1,0 +1,3 @@
+From: apt-xapian-index WithLOC: 2513  
+To: apt-xapian-index WithLOC: 3950  
+Differences:  30 files changed, 1866 insertions(+), 429 deletions(-)

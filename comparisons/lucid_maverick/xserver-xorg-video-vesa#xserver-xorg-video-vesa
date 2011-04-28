@@ -1,0 +1,3 @@
+From: xserver-xorg-video-vesa WithLOC: 11134  
+To: xserver-xorg-video-vesa WithLOC: 11146  
+Differences:  3 files changed, 153 insertions(+), 141 deletions(-)

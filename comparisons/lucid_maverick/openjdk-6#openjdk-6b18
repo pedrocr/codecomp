@@ -1,0 +1,3 @@
+From: openjdk-6 WithLOC: 585110  
+To: openjdk-6b18 WithLOC: 588470  
+Differences:  52 files changed, 4593 insertions(+), 1233 deletions(-)

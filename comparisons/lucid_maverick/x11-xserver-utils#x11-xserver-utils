@@ -1,0 +1,3 @@
+From: x11-xserver-utils WithLOC: 22798  
+To: x11-xserver-utils WithLOC: 22675  
+Differences:  7 files changed, 604 insertions(+), 727 deletions(-)
