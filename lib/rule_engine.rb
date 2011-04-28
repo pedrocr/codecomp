@@ -31,7 +31,7 @@ class RuleEngine
 
   #FIXME: Find a way to go from src to bin and find the votes so as to not have
   #       to specify it here
-  def include_src(src, votes)
+  def include_src(src, votes=0)
     $stderr.puts "Adding #{src} with #{votes} votes"
     @include_srcs << [src, votes]
   end
