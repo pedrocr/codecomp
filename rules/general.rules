@@ -17,6 +17,8 @@ same_src "clutter-gtk", "clutter-gtk-*"
 same_src "kdebluetooth", "kbluetooth"
 same_src "wine", "wine1.2"
 
+# Not really code
 ignore_src "iso-codes"
+ignore_src "language-support-*", "language-pack-*"
 
  
