@@ -4,22 +4,19 @@
 $-w = true
 require File.dirname(__FILE__)+"/../lib/all"
 
-if ARGV.size != 3
-  $stderr.puts "Usage: MassCompare <PkgList> <Distro1> <Distro2>"
+if ARGV.size != 2
+  $stderr.puts "Usage: MassCompare <Distro1> <Distro2>"
   exit 1
 end
 
-dist1 = ARGV[1]
-dist2 = ARGV[2]
+dist1 = ARGV[0]
+dist2 = ARGV[1]
 
 
 sinfo1 = SourcesInfo.new(dist1)
 sinfo2 = SourcesInfo.new(dist2)
 re = RuleEngine.new(sinfo1, sinfo2)
-
-bins = {}
-File.new(ARGV[0]).each {|line| pkg, number = line.split; bins[pkg] = number}
-re.process(bins)
+re.process
 
 $stderr.puts "Finished determining package matchups, #{Util.errors} errors and #{Util.warnings} warnings"
 if Util.errors > 0 || Util.warnings > 0
@@ -30,8 +27,9 @@ $stderr.puts "Success!! Proceeding with comparison"
 
 matchups = re.matchups
 matchups.each_with_index do |match, i|
-  s1, s2, votes = match
+  s1, s2 = match
   #puts "#{s1 ? s1 : "nil"}\##{s2 ? s2 : "nil"} #{votes}"
-  $stderr.puts "Comparison #{i+1}/#{matchups.size}: #{s1 ? s1 : "nil"} with #{s2 ? s2 : "nil"}"
-  Comparator.compare(s1, s2, sinfo1, sinfo2)
+  $stderr.puts "#{s1 ? s1 : "nil"}\##{s2 ? s2 : "nil"}"
+#  $stderr.puts "Comparison #{i+1}/#{matchups.size}: #{s1 ? s1 : "nil"} with #{s2 ? s2 : "nil"}"
+#  Comparator.compare(s1, s2, sinfo1, sinfo2)
 end

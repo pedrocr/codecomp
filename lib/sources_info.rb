@@ -62,7 +62,7 @@ class SourcesInfo
   attr_reader :distro
   include Enumerable
 
-  def initialize(distro, repos=["main", "multiverse", "restricted", "universe"])
+  def initialize(distro, repos=["main"])
     @BinToPackage = {}
     @PackageToFile = {}
     @simple_bundles = {}
@@ -128,6 +128,10 @@ class SourcesInfo
 
   def bin_to_bundle(bin)
     src_to_bundle(bin_to_package(bin))
+  end
+
+  def bundles
+    self.map {|src| src_to_bundle(src)}
   end
 
   def src_to_bundle(src)
@@ -225,7 +229,7 @@ end
 
 class Archive
   BASE_URL="http://archive.ubuntu.com/ubuntu/"
-  CACHE_DIR = "./pkgcache/"
+  CACHE_DIR = File.dirname(__FILE__)+"/../pkgcache/"
   NSEC_RETRY = 30
 
   def self.get(url, filename)
