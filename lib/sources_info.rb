@@ -85,23 +85,14 @@ class SourcesInfo
     dir = nil
 
     IO.popen("bzcat #{filename}").each do |line|
-      if line.include? ":"
+      if line.include? ":" or line.strip == ""
         in_files_section = false 
         fileobj = nil
       end
       if in_files_section
         @PackageToFile[currpkg] = fileobj ||= SourcePkg.new(currpkg, dir)
         md5, size, filename = line.split
-        finfo = FileInfo.new(filename, md5, size)
-        l = line.strip
-        if (l.endswith? ".tar.gz" and !l.endswith? ".debian.tar.gz") or 
-           (l.endswith? ".tar.bz2" and !l.endswith? ".debian.tar.bz2")
-          fileobj.orig = finfo
-        elsif line.strip.endswith? ".diff.gz" or line.strip.endswith? ".diff.bz2"
-          fileobj.diff = finfo
-        elsif line.strip.endswith? ".dsc"
-          fileobj.dsc = finfo 
-        end
+        fileobj.add_file FileInfo.new(filename, md5, size)
       elsif line.startswith? "Package:"
         currpkg = line.split[1]
       elsif line.startswith? "Binary:"
@@ -151,11 +142,22 @@ class SourcesInfo
 end
 
 class FileInfo
-  attr_reader :filename, :md5, :size
+  attr_reader :filename, :md5, :size, :type
   def initialize(filename, md5, size)
     @filename = filename
     @md5 = md5
-    @size = size
+    @size = size    
+
+    split = filename.split(".")
+    if split[-1] == 'dsc'
+      @type = :dsc
+    elsif split[-2] == 'diff'
+      @type = :diff
+    elsif ["gz","bz2","xz"].include? split[-1]
+      @type = :orig
+    else
+      @type = :unknown
+    end
   end
 end
 
@@ -169,24 +171,30 @@ class SourcePkg
     @package = package
     @directory = dir
     @pkgcache = pkgcache
-    @orig = nil
-    @diff = nil
+    @files = []
+  end
+
+  def add_file(finfo)
+    @files << finfo
+  end
+
+  def orig
+    @files.find{|f| f.type == :orig}
+  end
+  
+  def diff
+    @files.find{|f| f.type == :diff}
   end
 
   def download(distname, dest_dir=".")
-    Util.fatal_error "No source file for #{@package} in #{distname}" if !@orig
-    origfile = get_from_archive(@orig)
-    difffile = get_from_archive(@diff) if @diff
-    if @orig.filename.endswith? ".gz"
-      dflag = 'z'
-    elsif @orig.filename.endswith? ".bz2"
-      dflag = 'j'
-    else
-      Util.fatal_error "Unknown compressed file type #{@orig}"
-    end
+    Util.fatal_error "No source file for #{@package} in #{distname}" if !orig
+    origfile = get_from_archive(orig)
+    difffile = get_from_archive(diff) if diff
+    dflag = {"gz" => "z", "bz2" => "j", "xz" => "J"}[orig.filename.split(".")[-1]]
+    Util.fatal_error "Unknown compressed file type #{orig.filename}" if !dflag
 
     #Unpack the original file
-    origdir = @orig.filename.sub(".tar.gz", "").sub(".tar.bz2", "")
+    origdir = orig.filename.sub(".tar.gz", "").sub(".tar.bz2", "")
     FileUtils.mkdir tmpdir = dest_dir+"/"+origdir+"-"+distname+".tmpdir"
     Util.run_cmd "tar -C #{tmpdir} -#{dflag}xpf #{origfile}"
     newentries = Dir.entries(tmpdir)
@@ -195,14 +203,9 @@ class SourcePkg
     tardir += "/"+newentries.find{|d| d != "." && d != ".."} if newentries.size <= 3
 
     #Apply the diff if it exists
-    if @diff
-      if @diff.filename.endswith? ".gz"
-        cat = 'zcat'
-      elsif @orig.filename.endswith? ".bz2"
-        cat = 'bzcat'
-      else
-        Util.fatal_error "Unknown compressed file type #{@diff}"
-      end
+    if diff
+      cat = {"gz" => "zcat", "bz2" => "bzcat", "xz" => "xzcat"}[diff.filename.split(".")[-1]]
+      Util.fatal_error "Unknown compressed file type #{diff}" if !cat
       Util.run_cmd "#{cat} #{difffile} | patch -s -p1 -d #{tardir}"
     end
 
