@@ -1,8 +1,8 @@
 Priority
-Cleanup the .gz/.bz2/etc code
+Add votes to the comparison files
 
 Short-Term
 
-Remove vote tracking code and replace with adding up the votes for all the bin packages of a given src package so as to correctly account for multi-bin src comparisons
+Do some basic analysis of what ammount of effort goes into each level of the stack
 Obtain per-release or timeseries data on popularity
 Do a regression to explain popularity differences (ln(P2) = Rln(P1) + BX + E) where X is the amount of code differences
