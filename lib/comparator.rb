@@ -15,9 +15,7 @@ class Comparator
     resultsdir ||= File.dirname(__FILE__)+"/../comparisons/#{sources1.distro}_#{sources2.distro}"
     pkgname = (pkg1 ? pkg1 : "nil")+"#"+(pkg2 ? pkg2 : "nil")
     resultfile = resultsdir+"/"+pkgname
-    if File.exists? resultfile
-      $stderr.puts "Warning: #{resultfile} already exists, skipping comparison"
-    else
+    if !File.exists? resultfile
       FileUtils.mkdir_p resultsdir
       FileUtils.mkdir_p tmpdir = basetmpdir+"/"+pkgname
       file1 = pkg1 ? sources1.package_to_file(pkg1) : DummyFile.new
