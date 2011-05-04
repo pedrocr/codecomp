@@ -1,6 +1,6 @@
 require File.dirname(__FILE__)+"/tasks/all.rb"
 
-DISTS = ["jaunty","karmic","lucid","maverick"]
+DISTS = ["jaunty","karmic","lucid","maverick","natty"]
 
 desc "Compare all distributions"
 task :compare_all_dists do
