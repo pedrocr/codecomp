@@ -36,7 +36,8 @@ def mass_compare(dist1, dist2)
   cmpfile = File.dirname(__FILE__)+"/../data/#{dist1}_#{dist2}_comparisons"
   $stderr.puts "Writing #{cmpfile}"
   File.open(cmpfile, 'w') do |f|
-    f.puts ['from', 'to', 'from_loc', 'to_loc', 'files_changed', 'insertions', 'deletions'].join(',')
+    f.puts ['from', 'to', 'from_loc', 'to_loc', 'from_votes', 'to_votes', 
+            'files_changed', 'insertions', 'deletions'].join(',')
     matchups.each do |from, to|
       from ||= "nil"
       to ||= "nil"
@@ -44,10 +45,13 @@ def mass_compare(dist1, dist2)
       content = File.open(filename).readlines
       from_loc = read_loc(content[0])
       to_loc = read_loc(content[1])
+      from_votes = (from == "nil" ? 0 : sinfo1.src_to_bundle(from).votes)
+      to_votes = (to == "nil"  ? 0 : sinfo2.src_to_bundle(to).votes)
       files_changed = read_diffstat(content[2], "files changed")
       insertions = read_diffstat(content[2], "insertions")
       deletions = read_diffstat(content[2], "deletions")
-      f.puts [from, to, from_loc, to_loc, files_changed, insertions, deletions].join(',')
+      f.puts [from, to, from_loc, to_loc, from_votes, to_votes, 
+              files_changed, insertions, deletions].join(',')
     end
   end
   $stderr.puts "Finished comparing #{dist1} with #{dist2}"

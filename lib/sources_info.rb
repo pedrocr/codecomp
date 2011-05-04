@@ -5,6 +5,7 @@ require "utils"
 class SourceBundle
   attr_reader :src, :exprs, :sinfo, :matches
   def initialize(sinfo, options)
+    @sinfo = sinfo
     @src = nil
     if options[:src] 
       @src = options[:src] 
@@ -39,6 +40,10 @@ class SourceBundle
     @matches.sort[-1]
   end 
 
+  def votes
+    @matches.map{|m| sinfo.package_to_file(m).votes}.reduce(:+)
+  end
+
   def find_correspondent(sinfo)
     if @src
       if sinfo.include_src? @src
@@ -62,20 +67,45 @@ class SourcesInfo
   attr_reader :distro
   include Enumerable
 
-  def initialize(distro, repos=["main"])
-    @BinToPackage = {}
+  def initialize(distro, opts={})
     @PackageToFile = {}
+    @BinToVotes = {}
     @simple_bundles = {}
     @wildcard_bundles = []
     @ignore_srcs = []
     @distro = distro
 
-    repos.each do |repo|
-      repofile = "Sources-#{distro}-#{repo}.bz2"
-      fullpath = Archive.get("/dists/#{distro}/#{repo}/source/Sources.bz2",
-                               repofile)
-      parsefile(fullpath)
+    #FIXME: use a different file per distro
+    if opts[:popconfile]
+      parsepopcon(opts[:popconfile])
+    else
+      parsepopcon(File.dirname(__FILE__)+"/../data/popcon/all")
     end
+
+    repos = opts[:repos] || ["main"]
+    if opts[:parsefile]
+      parsefile opts[:parsefile]
+    else
+      repos.each do |repo|
+        repofile = "Sources-#{distro}-#{repo}.bz2"
+        fullpath = Archive.get("/dists/#{distro}/#{repo}/source/Sources.bz2",
+                                 repofile)
+        parsefile(fullpath)
+      end
+    end
+  end
+
+  def parsepopcon(filename)
+    File.open(filename).each do |line|
+      if line.startswith? "Package: "
+        s = line.split[1..-1]
+        @BinToVotes[s[0]] = s[1].to_i
+      end
+    end
+  end
+
+  def getvotes(bin)
+    @BinToVotes[bin] || 0
   end
 
   def parsefile(filename)
@@ -86,19 +116,18 @@ class SourcesInfo
 
     IO.popen("bzcat #{filename}").each do |line|
       if line.include? ":" or line.strip == ""
-        in_files_section = false 
-        fileobj = nil
+        in_files_section = false
       end
       if in_files_section
-        @PackageToFile[currpkg] = fileobj ||= SourcePkg.new(currpkg, dir)
         md5, size, filename = line.split
         fileobj.add_file FileInfo.new(filename, md5, size)
       elsif line.startswith? "Package:"
         currpkg = line.split[1]
+        @PackageToFile[currpkg] = fileobj = SourcePkg.new(currpkg)
       elsif line.startswith? "Binary:"
-        line.split[1..-1].each{|bin| @BinToPackage[bin.tr(",","")] = currpkg}
+        line[8..-1].split(",").each{|bin| fileobj.add_bin(bin.strip, getvotes(bin.strip))}
       elsif line.startswith? "Directory:"
-        dir = line.split[1]
+        fileobj.directory = line.split[1]
       elsif line.startswith? "Files:"
         in_files_section = true
       end
@@ -166,16 +195,22 @@ class SourcePkg
                  "xml","po",".js","ui","glade","css","d","desktop","f","html",
                  "yml", ".json", "tex", "txt", "s", "diff", "patch", "dpatch"]  
 
-  attr_accessor :package, :orig, :diff, :dsc, :directory
-  def initialize(package, dir, pkgcache="./pkgcache/")
+  attr_accessor :package, :directory
+  attr_reader :votes
+  def initialize(package, pkgcache="./pkgcache/")
     @package = package
-    @directory = dir
+    @directory = nil
     @pkgcache = pkgcache
     @files = []
+    @votes = 0
   end
 
   def add_file(finfo)
     @files << finfo
+  end
+
+  def add_bin(bin, votes)
+    @votes += votes
   end
 
   def orig
