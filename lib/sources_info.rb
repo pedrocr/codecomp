@@ -232,10 +232,13 @@ class SourcePkg
     origdir = orig.filename.sub(".tar.gz", "").sub(".tar.bz2", "")
     FileUtils.mkdir tmpdir = dest_dir+"/"+origdir+"-"+distname+".tmpdir"
     Util.run_cmd "tar -C #{tmpdir} -#{dflag}xpf #{origfile}"
-    newentries = Dir.entries(tmpdir)
+    
     tardir = tmpdir
     # Sometimes packages don't unpack into a new folder (newentries.size > 3)
-    tardir += "/"+newentries.find{|d| d != "." && d != ".."} if newentries.size <= 3
+    newentries = Dir.entries(tmpdir)
+    extradir = newentries.find{|d| d != "." && d != ".."}
+    newdir = tardir+"/"+extradir
+    tardir = newdir if newentries.size <= 3 and File.directory?(newdir)
 
     #Apply the diff if it exists
     if diff
