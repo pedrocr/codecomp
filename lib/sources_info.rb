@@ -48,19 +48,6 @@ class SourceBundle
     @matches.map{|m| sinfo.package_to_file(m).votes}.reduce(:+)
   end
 
-  def find_correspondent(sinfo)
-    if @src
-      if sinfo.include_src? @src
-        SourceBundle.new(sinfo, :src => @src)
-      else
-        nil
-      end
-    else
-      b = SourceBundle.new(sinfo, :exprs => @exprs)
-      b.matches.size > 0 ? b : nil
-    end
-  end
-
   private
   def find_all_matching_srcs(exprs, sinfo)
     sinfo.find_all{|src| exprs.map{|e| Util.match_expansion(e, src)}.inject{|a,b| a or b}}
