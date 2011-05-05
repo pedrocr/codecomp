@@ -39,7 +39,7 @@ def mass_compare(dist1, dist2)
     [bundle.votes, bundle.section]
   end
 
-  cmpfile = File.dirname(__FILE__)+"/../data/#{dist1}_#{dist2}_comparisons"
+  cmpfile = File.dirname(__FILE__)+"/../generated/#{dist1}_#{dist2}_comparisons"
   $stderr.puts "Writing #{cmpfile}"
   File.open(cmpfile, 'w') do |f|
     f.puts ['from', 'to', 'from_section', 'to_section', 'from_loc', 'to_loc', 

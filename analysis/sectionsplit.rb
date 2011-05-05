@@ -9,7 +9,7 @@ class CompResult
   
   def self.each(dist1,dist2)
     names = nil
-    FasterCSV.foreach(DATADIR+"/#{dist1}_#{dist2}_comparisons") do |row|
+    FasterCSV.foreach(GENDIR+"/#{dist1}_#{dist2}_comparisons") do |row|
       if !names
         names = row
       else
