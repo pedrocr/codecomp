@@ -1,0 +1,8 @@
+= codecomp
+
+This is a collection of scripts to do analysis of the evolution of code in open-source packages. Right now the following is working:
+
+* Matching consecutive versions of the same packages and doing some simple analysis of the amount of code churn in them. This is basically a diffstat of the total diff -R between two consecutive versions of the same package. A set of rules is used to match packages that should be compared but have changed name (e.g., eglibc and glibc).
+* Analysing the Ubuntu popularity contest results to figure out the most popular packages as well as linking the popularity to the code difference
+
+This is very much a work in progress. I'll be doing some blog posts with writeups of my findings soon.
