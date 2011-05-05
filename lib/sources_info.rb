@@ -40,6 +40,10 @@ class SourceBundle
     @matches.sort[-1]
   end 
 
+  def section
+    sinfo.package_to_file(pkg).section
+  end
+
   def votes
     @matches.map{|m| sinfo.package_to_file(m).votes}.reduce(:+)
   end
@@ -124,6 +128,8 @@ class SourcesInfo
       elsif line.startswith? "Package:"
         currpkg = line.split[1]
         @PackageToFile[currpkg] = fileobj = SourcePkg.new(currpkg)
+      elsif line.startswith? "Section:"
+        fileobj.section = line.split[1].strip
       elsif line.startswith? "Binary:"
         line[8..-1].split(",").each{|bin| fileobj.add_bin(bin.strip, getvotes(bin.strip))}
       elsif line.startswith? "Directory:"
@@ -195,7 +201,7 @@ class SourcePkg
                  "xml","po",".js","ui","glade","css","d","desktop","f","html",
                  "yml", ".json", "tex", "txt", "s", "diff", "patch", "dpatch"]  
 
-  attr_accessor :package, :directory
+  attr_accessor :package, :directory, :section
   attr_reader :votes
   def initialize(package, pkgcache="./pkgcache/")
     @package = package

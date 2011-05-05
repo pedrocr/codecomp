@@ -33,11 +33,17 @@ def mass_compare(dist1, dist2)
     match ? match[1].to_i : 0
   end
 
+  def get_votes_section(sinfo, pkg)
+    return [0,''] if !pkg or pkg == "nil"
+    bundle = sinfo.src_to_bundle(pkg)
+    [bundle.votes, bundle.section]
+  end
+
   cmpfile = File.dirname(__FILE__)+"/../data/#{dist1}_#{dist2}_comparisons"
   $stderr.puts "Writing #{cmpfile}"
   File.open(cmpfile, 'w') do |f|
-    f.puts ['from', 'to', 'from_loc', 'to_loc', 'from_votes', 'to_votes', 
-            'files_changed', 'insertions', 'deletions'].join(',')
+    f.puts ['from', 'to', 'from_section', 'to_section', 'from_loc', 'to_loc', 
+            'from_votes', 'to_votes', 'files_changed', 'insertions', 'deletions'].join(',')
     matchups.each do |from, to|
       from ||= "nil"
       to ||= "nil"
@@ -45,12 +51,12 @@ def mass_compare(dist1, dist2)
       content = File.open(filename).readlines
       from_loc = read_loc(content[0])
       to_loc = read_loc(content[1])
-      from_votes = (from == "nil" ? 0 : sinfo1.src_to_bundle(from).votes)
-      to_votes = (to == "nil"  ? 0 : sinfo2.src_to_bundle(to).votes)
+      from_votes, from_section = get_votes_section(sinfo1, from)
+      to_votes, to_section = get_votes_section(sinfo2, to)
       files_changed = read_diffstat(content[2], "files changed")
       insertions = read_diffstat(content[2], "insertions")
       deletions = read_diffstat(content[2], "deletions")
-      f.puts [from, to, from_loc, to_loc, from_votes, to_votes, 
+      f.puts [from, to, from_section, to_section, from_loc, to_loc, from_votes, to_votes, 
               files_changed, insertions, deletions].join(',')
     end
   end
