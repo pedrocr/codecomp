@@ -20,7 +20,7 @@ class CompResult
 end
 
 desc "plot sections by code churn"
-task :sectionsplit do
+task :sectionsplit => [:compare_all_dists] do
   DISTPAIRS.each do |dist1, dist2|
     n = 0
     CompResult.each(dist1,dist2) do |cmp|

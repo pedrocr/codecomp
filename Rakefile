@@ -1,16 +1,20 @@
-require File.dirname(__FILE__)+"/tasks/all.rb"
-
 DISTS = ["jaunty","karmic","lucid","maverick","natty"]
 DISTPAIRS = DISTS[0..-2].zip(DISTS[1..-1])
 DATADIR = File.expand_path("data/", File.dirname(__FILE__))
 GENDIR = File.expand_path("generated/", File.dirname(__FILE__))
+TASKSDIR = File.expand_path("tasks/", File.dirname(__FILE__))
+ANALYSISDIR = File.expand_path("analysis/", File.dirname(__FILE__))
 
-desc "Compare all distributions"
-task :compare_all_dists do
-  DISTPAIRS.each do |d1,d2| 
-    mass_compare(d1,d2)
-  end
+require File.dirname(__FILE__)+"/lib/all"
+
+Dir.glob(TASKSDIR+"/*.rb").each{|file| require file}
+namespace :analysis do |n|
+  Dir.glob(ANALYSISDIR+"/*.rb").each{|file| require file}
+  task :all => n.tasks.map{|t| t.name}
 end
 
+desc "Run all analysis"
+task :analysis => ["analysis:all"]
+
 desc "Run everything"
-task :default => [:compare_all_dists]
+task :default => ["analysis"]
