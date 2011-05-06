@@ -1,7 +1,7 @@
 desc "predict code churn based on size"
 task :sizevschurn => [:compare_all_dists] do
   File.open(GENDIR+"/sizevschurn", "w") do |f|
-    f.puts "CHURN SIZE LN_SIZE"
+    f.puts "CHURN LN_SIZE"
     CompResult.each do |cmp|
       if cmp.from != "nil" and cmp.to != "nil"
         size = (cmp.from_loc.to_i+cmp.to_loc.to_i)/2
@@ -11,7 +11,7 @@ task :sizevschurn => [:compare_all_dists] do
         # being deletions and all the "to" package being insertions
         if size != 0 and churn < 200
           ln_size = Math.log(size)
-          f.puts [churn,size,ln_size].join(" ")
+          f.puts [churn,ln_size].join(" ")
         end
       end
     end
