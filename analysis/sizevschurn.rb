@@ -1,6 +1,8 @@
 desc "predict code churn based on size"
 task :sizevschurn => [:compare_all_dists] do
-  File.open(GENDIR+"/sizevschurn", "w") do |f|
+  tmpfile = TMPDIR+"/sizevschurn"
+
+  File.open(tmpfile, "w") do |f|
     f.puts "CHURN LN_SIZE"
     CompResult.each do |cmp|
       if cmp.from != "nil" and cmp.to != "nil"
@@ -19,4 +21,6 @@ task :sizevschurn => [:compare_all_dists] do
   rfile = File.expand_path("sizevschurn.R", File.dirname(__FILE__))
   output = File.expand_path("../generated/sizevschurnoutput", File.dirname(__FILE__))
   system("R -q --vanilla < #{rfile} > #{output}")
+
+  FileUtils.rm_f tmpfile
 end

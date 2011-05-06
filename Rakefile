@@ -4,6 +4,8 @@ DATADIR = File.expand_path("data/", File.dirname(__FILE__))
 GENDIR = File.expand_path("generated/", File.dirname(__FILE__))
 TASKSDIR = File.expand_path("tasks/", File.dirname(__FILE__))
 ANALYSISDIR = File.expand_path("analysis/", File.dirname(__FILE__))
+TMPDIR = File.expand_path("tmpdir/", File.dirname(__FILE__))
+FileUtils.mkdir_p TMPDIR
 
 require File.dirname(__FILE__)+"/lib/all"
 
