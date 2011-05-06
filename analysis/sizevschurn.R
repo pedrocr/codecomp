@@ -1,5 +1,5 @@
 attach(read.table("tmpdir/sizevschurn", header=TRUE))
 pdf(file="generated/sizevschurnplot.pdf")
 plot(log(SIZE),log(CHURN),cex=0.7)
-plot(log(SIZE),CHURN)
+plot(log(SIZE),CHURN,cex=0.7)
 summary(glm(CHURN ~ log(SIZE)))
