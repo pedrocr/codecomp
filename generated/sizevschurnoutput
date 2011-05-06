@@ -1,27 +1,28 @@
 > attach(read.table("tmpdir/sizevschurn", header=TRUE))
 > pdf(file="generated/sizevschurnplot.pdf")
-> plot(LN_SIZE,CHURN)
-> summary(glm(CHURN ~ LN_SIZE))
+> plot(log(SIZE),log(CHURN),cex=0.7)
+> plot(log(SIZE),CHURN)
+> summary(glm(CHURN ~ log(SIZE)))
 
 Call:
-glm(formula = CHURN ~ LN_SIZE)
+glm(formula = CHURN ~ log(SIZE))
 
 Deviance Residuals: 
     Min       1Q   Median       3Q      Max  
--50.885  -23.170  -17.469    8.223  187.665  
+-34.212  -23.226  -17.491    8.161  187.782  
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept)  50.8848     1.7699   28.75   <2e-16 ***
-LN_SIZE      -2.7123     0.1778  -15.26   <2e-16 ***
+(Intercept)  51.3859     1.7970   28.60   <2e-16 ***
+log(SIZE)    -2.7557     0.1802  -15.29   <2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
-(Dispersion parameter for gaussian family taken to be 1498.912)
+(Dispersion parameter for gaussian family taken to be 1493.890)
 
-    Null deviance: 12215823  on 7918  degrees of freedom
-Residual deviance: 11866884  on 7917  degrees of freedom
-AIC: 80385
+    Null deviance: 12122615  on 7882  degrees of freedom
+Residual deviance: 11773351  on 7881  degrees of freedom
+AIC: 79993
 
 Number of Fisher Scoring iterations: 2
 
