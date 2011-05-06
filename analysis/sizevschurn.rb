@@ -26,7 +26,7 @@ task :sizevschurn => [:compare_all_dists] do
   end
   rfile = File.expand_path("sizevschurn.R", File.dirname(__FILE__))
   output = File.expand_path("../generated/sizevschurnoutput", File.dirname(__FILE__))
-  system("R -q --vanilla < #{rfile} > #{output}")
+  system("R --slave --vanilla < #{rfile} > #{output}")
 
   FileUtils.rm_f tmpfile
 end
