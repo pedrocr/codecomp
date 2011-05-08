@@ -1,6 +1,3 @@
-attach(read.table("generated/sectionsplitdata", header=TRUE))
-
-pdf(file="generated/sectionsplit.pdf")
 par(mar=c(5,4.5,0.5,0.5), cex=1.1)
 
 total <- CORE+BASE+USER

@@ -1,14 +1,19 @@
 require "faster_csv"
 
-desc "plot sections by code churn"
-task :sectionsplit => [GENDIR+"/sectionsplit.pdf"]
+PDF = GENDIR+"/sectionsplit.pdf"
+RFILE = File.expand_path("sectionsplit.R", File.dirname(__FILE__))
+DATAFILE = GENDIR+"/sectionsplitdata"
 
-file (GENDIR+"/sectionsplit.pdf") => [GENDIR+"/sectionsplitdata",File.expand_path("sectionsplit.R", File.dirname(__FILE__))] do |t|
-  rfile = File.expand_path("sectionsplit.R", File.dirname(__FILE__))
-  system("R --slave --vanilla < #{rfile} > /dev/null")
+desc "plot sections by code churn"
+task :sectionsplit => [PDF]
+
+file PDF => [DATAFILE,RFILE] do |t|
+  run_r File.expand_path("sectionsplit.R", File.dirname(__FILE__)),
+        :datafile => DATAFILE,
+        :pdf => PDF
 end
 
-file (GENDIR+"/sectionsplitdata") => [:compare_all_dists,__FILE__] do |t|
+file DATAFILE => [:compare_all_dists,__FILE__] do |t|
   churns = {}
 
   types = {}
