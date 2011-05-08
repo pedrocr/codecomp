@@ -1,9 +1,15 @@
 require "faster_csv"
 
 desc "plot sections by code churn"
-task :sectionsplit => [:compare_all_dists] do
+task :sectionsplit => [GENDIR+"/sectionsplit.pdf"]
+
+file (GENDIR+"/sectionsplit.pdf") => [GENDIR+"/sectionsplitdata",File.expand_path("sectionsplit.R", File.dirname(__FILE__))] do |t|
+  rfile = File.expand_path("sectionsplit.R", File.dirname(__FILE__))
+  system("R --slave --vanilla < #{rfile} > /dev/null")
+end
+
+file (GENDIR+"/sectionsplitdata") => [:compare_all_dists,__FILE__] do |t|
   churns = {}
-  n = 0
 
   types = {}
   ["cli-mono","devel","embedded","interpreters","java","libdevel","libs",
@@ -23,19 +29,12 @@ task :sectionsplit => [:compare_all_dists] do
     churns[type] ||= {}
     churns[type]["#{dist1}_#{dist2}"] ||= 0
     churns[type]["#{dist1}_#{dist2}"] += (cmp.insertions.to_i+cmp.deletions.to_i)
-    n += 1
   end
 
-  tmpfile = TMPDIR+"/sectionsplit"
-  File.open(tmpfile, "w") do |f|
-    
+  File.open(t.name, "w") do |f|    
     f.puts "CORE BASE USER"
     DISTPAIRS.each do |d1, d2|
       f.puts([:core,:base,:user].map{|t| churns[t]["#{d1}_#{d2}"]||0}.join(" "))
     end
   end
-  rfile = File.expand_path("sectionsplit.R", File.dirname(__FILE__))
-  system("R --slave --vanilla < #{rfile} > /dev/null")
-
-  FileUtils.rm_f tmpfile
 end
