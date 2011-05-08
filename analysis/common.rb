@@ -30,10 +30,14 @@ class CompResult
 end
 
 def run_r(file, opts={})
-  IO.popen("R --slave --vanilla","w") do |proc|
-    proc.puts("pdf(file=\"#{opts[:pdf]}\")") if opts[:pdf]
+  $stderr.puts "Running #{file}"
+
+  IO.popen("R --slave --vanilla","w+") do |proc|
+    proc.puts("pdf(file=\"#{opts[:pdf]}\")") 
     proc.puts("attach(read.table(\"#{opts[:datafile]}\", header=TRUE),name=\"datafile\")") if opts[:datafile]
     proc.puts File.open(file).read
     proc.close_write
+    output = proc.read
+    File.open(opts[:output],"w"){|f| f.write output} if opts[:output]
   end
 end
