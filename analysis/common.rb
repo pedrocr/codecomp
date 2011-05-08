@@ -31,9 +31,12 @@ end
 
 def run_r(file, opts={})
   IO.popen("R --slave --vanilla","w") do |proc|
-   proc.puts("pdf(file=\"#{opts[:pdf]}\")") if opts[:pdf]
-   proc.puts("attach(read.table(\"#{opts[:datafile]}\", header=TRUE))") if opts[:datafile]
-   proc.puts File.open(file).read
-   proc.close_write
+    proc.puts("pdf(file=\"#{opts[:pdf]}\")") if opts[:pdf]
+    if opts[:datafile]
+      proc.puts("data_to_attach <- read.table(\"#{opts[:datafile]}\", header=TRUE)")
+      proc.puts("attach(data_to_attach)")
+    end
+    proc.puts File.open(file).read
+    proc.close_write
   end
 end
