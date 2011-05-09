@@ -58,16 +58,11 @@ class RTask
     @desc = str
   end
 
-  def run_R(opts={})
-    if not (opts[:output]||opts[:pdf])
-      Util.fatal_error "run_R without :output or :plot, are you just trying to heat up the room?"
-    end
-
-    opts.each do |k,v|
-      @outputs << (output = GENDIR+"/"+@name+"/"+v)
-      Rake::FileTask.define_task(output => [datafile,rfile]) do
-        exec_R rfile, opts.merge(:datafile => datafile)
-      end
+  def run_R(type, opts={})
+    output = GENDIR+"/"+@name+(type == :none ? "/output" : "/plot.#{type}")
+    @outputs << output
+    Rake::FileTask.define_task(output => [datafile,rfile]) do
+      exec_R(rfile, type, :datafile => datafile)
     end
   end
 
@@ -77,16 +72,15 @@ class RTask
     end
   end
 
-  def exec_R(file, opts={})
-    $stderr.puts "Running #{file}"
-
+  def exec_R(file, type, opts={})
+    $stderr.puts "Running #{file} for #{type.inspect}"
     IO.popen("R --slave --vanilla","w+") do |proc|
-      proc.puts("pdf(file=\"#{GENDIR}/#{@name}/#{opts[:pdf]}\")") 
+      proc.puts("#{type}(file=\"#{GENDIR}/#{@name}/plot.#{type}\")")
       proc.puts("attach(read.table(\"#{opts[:datafile]}\", header=TRUE),name=\"datafile\")") if opts[:datafile]
-      proc.puts File.open(file).read
+      proc.puts File.read(file)
       proc.close_write
       output = proc.read
-      File.open(GENDIR+"/"+@name+"/"+opts[:output],"w"){|f| f.write output} if opts[:output]
+      File.open(GENDIR+"/"+@name+"/output","w"){|f| f.write output}
     end
   end
 end

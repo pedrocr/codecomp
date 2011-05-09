@@ -1,5 +1,6 @@
 desc "predict code churn based on size"
-run_R :pdf => "plot.pdf", :output => "output"
+run_R :png
+run_R :pdf
 
 create_data do
   File.open(datafile, "w") do |f|
