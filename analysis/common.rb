@@ -16,7 +16,7 @@ class CompResult
   def self.each(opts={})
     DISTPAIRS.each do |dist1, dist2|
       names = nil
-      FasterCSV.foreach(GENDIR+"/comparisons/#{dist1}_#{dist2}") do |row|
+      FasterCSV.foreach(GENDIR+"comparisons/#{dist1}_#{dist2}") do |row|
         if !names
           names = row
         else
@@ -37,7 +37,7 @@ class RTask
     @filename = file
     @name = File.basename(file).split(".")[0]
     eval_file(file)
-    mkdirtask = Rake::Task.define_task("mkdir_"+@name){FileUtils.mkdir_p GENDIR+"/"+@name}
+    mkdirtask = Rake::Task.define_task("mkdir_"+@name){FileUtils.mkdir_p GENDIR+@name}
     @maintask = Rake::Task.define_task(@name => [mkdirtask]+@outputs)
     @maintask.add_description @desc if @desc
   end
@@ -47,11 +47,11 @@ class RTask
   end
 
   def datafile
-    GENDIR+"/"+@name+"/data"
+    GENDIR+@name+"/data"
   end
 
   def rfile
-    ANALYSISDIR+"/"+@name+".R"
+    ANALYSISDIR+@name+".R"
   end
 
   def desc(str)
@@ -59,7 +59,7 @@ class RTask
   end
 
   def run_R(opts={})
-    @outputs << (output = GENDIR+"/"+@name+"/Rplots.pdf")
+    @outputs << (output = GENDIR+@name+"/Rplots.pdf")
     Rake::FileTask.define_task(output => [datafile,rfile,]) do
       exec_R(rfile, datafile)
     end
@@ -74,12 +74,12 @@ class RTask
   def exec_R(rfile, dfile)
     $stderr.puts "Running #{rfile}"
     IO.popen("R --slave --vanilla","w+") do |proc|
-      proc.puts("pdf(file=\"#{GENDIR}/#{@name}/Rplots.pdf\")")
+      proc.puts("pdf(file=\"#{GENDIR}#{@name}/Rplots.pdf\")")
       proc.puts("attach(read.table(\"#{dfile}\", header=TRUE),name=\"datafile\")")
       proc.puts File.read(rfile)
       proc.close_write
       output = proc.read
-      File.open(GENDIR+"/"+@name+"/output","w"){|f| f.write output}
+      File.open(GENDIR+@name+"/output","w"){|f| f.write output}
     end
   end
 end

@@ -4,14 +4,14 @@ task :mass_compare, [:dist1, :dist2] do |t, args|
 end
 
 DISTPAIRS.each do |d1,d2|
-  file GENDIR+"/comparisons/#{d1}_{d2}" do
+  file GENDIR+"comparisons/#{d1}_#{d2}" do
     $stderr.puts "Comparing #{d1} with #{d2}"
     mass_compare(d1,d2)
   end
 end
 
 desc "Compare all distributions"
-task :compare_all_dists => DISTPAIRS.map{|d1,d2| File.expand_path("comparisons/#{d1}_#{d2}",GENDIR)}
+task :compare_all_dists => DISTPAIRS.map{|d1,d2| "generated/comparisons/#{d1}_#{d2}"}
 
 def mass_compare(dist1, dist2)
   sinfo1 = SourcesInfo.new(dist1)
@@ -49,9 +49,9 @@ def mass_compare(dist1, dist2)
     [bundle.votes, bundle.section]
   end
 
-  cmpdir = File.dirname(__FILE__)+"/../generated/comparisons/"
+  cmpdir = GENDIR+"comparisons/"
   FileUtils.mkdir_p cmpdir  
-  cmpfile = File.expand_path("#{dist1}_#{dist2}", cmpdir)
+  cmpfile = cmpdir+"#{dist1}_#{dist2}"
   $stderr.puts "Writing #{cmpfile}"
   File.open(cmpfile, 'w') do |f|
     f.puts ['from', 'to', 'from_section', 'to_section', 'from_loc', 'to_loc', 
@@ -59,7 +59,7 @@ def mass_compare(dist1, dist2)
     matchups.each do |from, to|
       from ||= "nil"
       to ||= "nil"
-      filename = File.dirname(__FILE__)+"/../cmpcache/#{dist1}_#{dist2}/#{from}\##{to}"
+      filename = "cmpcache/#{dist1}_#{dist2}/#{from}\##{to}"
       content = File.open(filename).readlines
       from_loc = read_loc(content[0])
       to_loc = read_loc(content[1])
