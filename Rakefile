@@ -7,11 +7,14 @@ ANALYSISDIR = File.expand_path("analysis/", File.dirname(__FILE__))
 TMPDIR = File.expand_path("tmpdir/", File.dirname(__FILE__))
 FileUtils.mkdir_p TMPDIR
 
-require File.dirname(__FILE__)+"/lib/all"
+require "lib/all"
+require "analysis/common"
 
 Dir.glob(TASKSDIR+"/*.rb").each{|file| require file}
 namespace :analysis do |n|
-  Dir.glob(ANALYSISDIR+"/*.rb").each{|file| require file}
+  Dir.glob(ANALYSISDIR+"/*.rb").each do |file|
+    RTask.new(file) if File.basename(file) != "common.rb"
+  end
   task :all => n.tasks.map{|t| t.name}
 end
 
