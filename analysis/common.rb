@@ -63,7 +63,7 @@ class RTask
     when :pdf
       output = GENDIR+"/"+@name+"/Rplots.pdf"
     when :png
-      output = GENDIR+"/"+@name+"/Rplot001.pdf"
+      output = GENDIR+"/"+@name+"/Rplot001.png"
     end
     @outputs << output
     Rake::FileTask.define_task(output => [datafile,rfile]) do
