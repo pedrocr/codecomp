@@ -3,14 +3,15 @@ task :mass_compare, [:dist1, :dist2] do |t, args|
   mass_compare(args.dist1, args.dist2)
 end
 
-rule '_comparisons' do |t|
-  d1,d2 = File.basename(t.name).split("_")[0..1]
-  $stderr.puts "Comparing #{d1} with #{d2}"
-  mass_compare(d1,d2)
+DISTPAIRS.each do |d1,d2|
+  file GENDIR+"/comparisons/#{d1}_{d2}" do
+    $stderr.puts "Comparing #{d1} with #{d2}"
+    mass_compare(d1,d2)
+  end
 end
 
 desc "Compare all distributions"
-task :compare_all_dists => DISTPAIRS.map{|d1,d2| File.expand_path("#{d1}_#{d2}_comparisons",GENDIR)}
+task :compare_all_dists => DISTPAIRS.map{|d1,d2| File.expand_path("comparisons/#{d1}_#{d2}",GENDIR)}
 
 def mass_compare(dist1, dist2)
   sinfo1 = SourcesInfo.new(dist1)
