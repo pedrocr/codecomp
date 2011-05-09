@@ -1,13 +1,13 @@
 desc "predict code churn based on size"
-run_R :png
-run_R :pdf
+run_R
 
 create_data do
   File.open(datafile, "w") do |f|
-    f.puts "CHURN SIZE"
+    f.puts "CHURN SIZE GROWTH"
     CompResult.each do |cmp|
       if cmp.from != "nil" and cmp.to != "nil"
         size = cmp.from_loc.to_f
+        growth = (cmp.to_loc.to_f/size-1)*100
         churn = (cmp.insertions.to_i+cmp.deletions.to_i).to_f/size*100/2
 
         # (churn < 100) Eliminate packages where commonality seems to be so low 
@@ -20,7 +20,7 @@ create_data do
         # (churn > 0) Ignore packages with no changes and avoid log(0) if doing
         # log(CHURN) in R
         if churn < 100 and churn > 0
-          f.puts [churn,size].join(" ")
+          f.puts [churn,size,growth].join(" ")
         end
       end
     end

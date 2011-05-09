@@ -1,6 +1,5 @@
 desc "plot sections by code churn"
-run_R :png
-run_R :pdf
+run_R
 
 create_data do
   churns = {}

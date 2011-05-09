@@ -58,38 +58,25 @@ class RTask
     @desc = str
   end
 
-  def run_R(type, opts={})
-    case type
-    when :pdf
-      output = GENDIR+"/"+@name+"/Rplots.pdf"
-    when :png
-      output = GENDIR+"/"+@name+"/Rplot001.png"
-    end
-    @outputs << output
-    Rake::FileTask.define_task(output => [datafile,rfile]) do
-      exec_R(rfile, type, :datafile => datafile)
+  def run_R(opts={})
+    @outputs << (output = GENDIR+"/"+@name+"/Rplots.pdf")
+    Rake::FileTask.define_task(output => [datafile,rfile,]) do
+      exec_R(rfile, datafile)
     end
   end
 
   def create_data(&f)
-    Rake::FileTask.define_task(datafile => [:compare_all_dists, @filename]) do
+    Rake::FileTask.define_task(datafile => [:compare_all_dists, @filename, __FILE__]) do
       f.call
     end
   end
 
-  def exec_R(file, type, opts={})
-    $stderr.puts "Running #{file} for #{type.inspect}"
+  def exec_R(rfile, dfile)
+    $stderr.puts "Running #{rfile}"
     IO.popen("R --slave --vanilla","w+") do |proc|
-      case type
-      when :pdf
-        proc.puts("pdf(file=\"#{GENDIR}/#{@name}/Rplots.pdf\")")
-      when :png
-        proc.puts("png(file=\"#{GENDIR}/#{@name}/Rplot%03d.png\")")
-      else 
-        Util.fatal_error("Don't know how to plot #{type.inspect}")
-      end
-      proc.puts("attach(read.table(\"#{opts[:datafile]}\", header=TRUE),name=\"datafile\")") if opts[:datafile]
-      proc.puts File.read(file)
+      proc.puts("pdf(file=\"#{GENDIR}/#{@name}/Rplots.pdf\")")
+      proc.puts("attach(read.table(\"#{dfile}\", header=TRUE),name=\"datafile\")")
+      proc.puts File.read(rfile)
       proc.close_write
       output = proc.read
       File.open(GENDIR+"/"+@name+"/output","w"){|f| f.write output}
