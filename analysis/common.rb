@@ -16,7 +16,7 @@ class CompResult
   def self.each(opts={})
     DISTPAIRS.each do |dist1, dist2|
       names = nil
-      FasterCSV.foreach(GENDIR+"/#{dist1}_#{dist2}_comparisons") do |row|
+      FasterCSV.foreach(GENDIR+"/comparisons/#{dist1}_#{dist2}") do |row|
         if !names
           names = row
         else

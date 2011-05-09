@@ -48,7 +48,9 @@ def mass_compare(dist1, dist2)
     [bundle.votes, bundle.section]
   end
 
-  cmpfile = File.dirname(__FILE__)+"/../generated/#{dist1}_#{dist2}_comparisons"
+  cmpdir = File.dirname(__FILE__)+"/../generated/comparisons/"
+  FileUtils.mkdir_p cmpdir  
+  cmpfile = File.expand_path("#{dist1}_#{dist2}", cmpdir)
   $stderr.puts "Writing #{cmpfile}"
   File.open(cmpfile, 'w') do |f|
     f.puts ['from', 'to', 'from_section', 'to_section', 'from_loc', 'to_loc', 
@@ -56,7 +58,7 @@ def mass_compare(dist1, dist2)
     matchups.each do |from, to|
       from ||= "nil"
       to ||= "nil"
-      filename = File.dirname(__FILE__)+"/../comparisons/#{dist1}_#{dist2}/#{from}\##{to}"
+      filename = File.dirname(__FILE__)+"/../cmpcache/#{dist1}_#{dist2}/#{from}\##{to}"
       content = File.open(filename).readlines
       from_loc = read_loc(content[0])
       to_loc = read_loc(content[1])

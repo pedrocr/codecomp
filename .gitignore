@@ -1,4 +1,4 @@
-pkgcache/
 *~
-tmpdir/
-comparisons/
+/pkgcache/
+/cmpcache/
+/tmpdir/
