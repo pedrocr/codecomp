@@ -32,13 +32,17 @@ class CompResult
 end
 
 class RTask
+  # Defines a task that generates data, runs R scripts to produce plots and
+  # output text, and generates pngs with convert from the R pdf plots
+
   def initialize(file)
-    @outputs = []
+    @plots = []
+    @pngs = []
     @filename = file
     @name = File.basename(file).split(".")[0]
     eval_file(file)
     mkdirtask = Rake::Task.define_task("mkdir_"+@name){FileUtils.mkdir_p GENDIR+@name}
-    @maintask = Rake::Task.define_task(@name => [mkdirtask]+@outputs)
+    @maintask = Rake::Task.define_task(@name => [mkdirtask]+@plots+@pngs)
     @maintask.add_description @desc if @desc
   end
 
@@ -59,9 +63,16 @@ class RTask
   end
 
   def run_R(opts={})
-    @outputs << (output = GENDIR+@name+"/Rplots.pdf")
-    Rake::FileTask.define_task(output => [datafile,rfile,]) do
+    @plots << (output = GENDIR+@name+"/Rplots.pdf")
+    Rake::FileTask.define_task(output => [datafile,rfile,__FILE__]) do
       exec_R(rfile, datafile)
+    end
+  end
+
+  def png(page, name, opts={})
+    @pngs << (filename = GENDIR+@name+"/"+name+".png")
+    Rake::FileTask.define_task(filename => [@plots,__FILE__]) do
+      exec_convert(page,filename,opts)
     end
   end
 
@@ -81,5 +92,11 @@ class RTask
       output = proc.read
       File.open(GENDIR+@name+"/output","w"){|f| f.write output}
     end
+  end
+
+  def exec_convert(page, filename, opts)
+    $stderr.puts "Writing #{filename}"
+    copts = opts.map{|v| v.split}.flatten
+    sh *(["convert"]+copts+[@plots[0]+"[#{page}]", filename])
   end
 end

@@ -1,5 +1,6 @@
 desc "predict code churn based on size"
 run_R
+png 1, "figure", ["-geometry 500x500"]
 
 create_data do
   File.open(datafile, "w") do |f|
