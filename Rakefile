@@ -5,7 +5,7 @@ GENDIR = "generated/"
 TASKSDIR = "tasks/"
 ANALYSISDIR = "analysis/"
 TMPDIR = "tmpdir/"
-FileUtils.mkdir_p TMPDIR,GENDIR
+FileUtils.mkdir_p [TMPDIR,GENDIR]
 
 require "lib/all"
 require "analysis/common"
