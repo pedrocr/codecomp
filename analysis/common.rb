@@ -85,7 +85,7 @@ class RTask
   def exec_R(rfile, dfile)
     $stderr.puts "Running #{rfile}"
     IO.popen("R --slave --vanilla","w+") do |proc|
-      proc.puts("pdf(file=\"#{GENDIR}#{@name}/Rplots.pdf\")")
+      proc.puts("pdf(file=\"#{GENDIR}#{@name}/Rplots.pdf\",width=9,height=5)")
       proc.puts("attach(read.table(\"#{dfile}\", header=TRUE),name=\"datafile\")")
       proc.puts File.read(rfile)
       proc.close_write
@@ -97,6 +97,6 @@ class RTask
   def exec_convert(page, filename, opts)
     $stderr.puts "Writing #{filename}"
     copts = opts.map{|v| v.split}.flatten
-    sh *(["convert"]+copts+[@plots[0]+"[#{page}]", filename])
+    sh *(["convert","-density","600x600"]+copts+[@plots[0]+"[#{page}]", filename])
   end
 end

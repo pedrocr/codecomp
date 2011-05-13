@@ -1,4 +1,5 @@
-par(mar=c(5,4.5,0.5,0.5), cex=1.1)
+mycex = 1.2
+par(mar=c(5,7,1,7), cex=mycex)
 
 total <- CORE+BASE+USER
 ymax <- 180*10^6
@@ -12,7 +13,7 @@ title(xlab= "Release cycle")
 
 ymarks = c(-100,10,40,70,100,130,160,2000)
 axis(2, las=1, at=ymarks*10^6, labels=ymarks)
-title(ylab= "Total Churn (Million Lines of Diff Output)")
+title(ylab="Total Churn\n(Millions of Diff Changed Lines)")
 
 lines(CORE, type="o", col="red")
 lines(BASE, type="o", col="blue")

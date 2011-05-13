@@ -1,10 +1,10 @@
 
 Call:
-glm(formula = CHURN ~ log(SIZE))
+lm(formula = CHURN ~ log(SIZE))
 
-Deviance Residuals: 
-    Min       1Q   Median       3Q      Max  
--18.631  -11.483   -8.098    4.261   93.338  
+Residuals:
+    Min      1Q  Median      3Q     Max 
+-18.631 -11.483  -8.098   4.261  93.338 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
@@ -13,11 +13,7 @@ log(SIZE)   -1.76656    0.08617  -20.50   <2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
-(Dispersion parameter for gaussian family taken to be 351.0045)
-
-    Null deviance: 2896951  on 7834  degrees of freedom
-Residual deviance: 2749418  on 7833  degrees of freedom
-AIC: 68158
-
-Number of Fisher Scoring iterations: 2
+Residual standard error: 18.74 on 7833 degrees of freedom
+Multiple R-squared: 0.05093,	Adjusted R-squared: 0.05081 
+F-statistic: 420.3 on 1 and 7833 DF,  p-value: < 2.2e-16 
 
