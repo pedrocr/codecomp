@@ -5,4 +5,29 @@ This is a collection of scripts to do analysis of the evolution of code in open-
 * Matching consecutive versions of the same Ubuntu source packages and doing some simple analysis of the amount of code churn in them. This is basically a diffstat of the total diff -R between two consecutive versions of the same package. A set of rules is used to match packages that should be compared but have changed name (e.g., eglibc and glibc).
 * Analysing the Ubuntu popularity contest results to figure out the most popular packages as well as linking the popularity to the code difference
 
-This is very much a work in progress. I'll be doing some blog posts with writeups of my findings soon.
+I have also written two analysis based on these:
+
+* Evolution of the total changes in each of the last 4 Ubuntu development cycles
+* Comparison between the size of a package and its rate of mutation.
+
+See my first writeup for an explanation:
+
+http://pedrocr.net/text/preliminary-results-open-source-evolution
+
+== Dependencies
+
+You'll need at least:
+
+* Ruby
+* Rake
+* R
+* convert (from ImageMagick or GraphicsMagick)
+* A normal Unix userland (at least diff, patch, diffstat, find, tar). Some of it may use some GNU extensions (particularly tar)
+
+== Running it
+
+Running rake anywhere on the tree should build anything that isn't yet built. The generated/ dir can be removed to make the generation start from scratch.
+
+== License
+
+The code is licensed under GPLv2. See the LICENSE file for details
