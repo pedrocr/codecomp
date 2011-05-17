@@ -42,7 +42,7 @@ class RTask
     @name = File.basename(file).split(".")[0]
     eval_file(file)
     mkdirtask = Rake::Task.define_task("mkdir_"+@name){FileUtils.mkdir_p GENDIR+@name}
-    @maintask = Rake::Task.define_task(@name => [mkdirtask]+@plots+@pngs)
+    @maintask = Rake::Task.define_task(@name => [mkdirtask,datafile]+@plots+@pngs)
     @maintask.add_description @desc if @desc
   end
 
