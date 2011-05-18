@@ -8,17 +8,33 @@ create_data do
   dist2 = "natty"
   sinfo2 = SourcesInfo.new(dist2)
 
-  EXTRA_PACKAGES = {:gnu => %w{gnutls26 texinfo binutils gdb eglibc coreutils gnupg2 mailman tar},
-                    :kernel => %w{iptables ps3-kboot libvirt u-boot qemu-kvm alsa-driver syslinux util-linux udev e2fsprogs openhpi},
-                    :bsd => %w{openssh bsdmainutils},
-                    :gnome => %w{gimp gimp-help gcalctool gnome-vfs gvfs},
-                    :misc => %w{likewise-open eucalyptus-commons-ext},
-                    :devel => %w{llvm-2.7 llvm-2.8 boost1.42 gccxml subversion bzr icu valgrind openssl openldap gwt git tcl8.5 tk8.4 tk8.5 openjdk-6 openjdk-6b18 php5 db4.8 clutter1.0},
-                    :kde => %w{k3b ktorrent webkit qtwebkit-source},
-                    :userapps => %w{inkscape digikam ubiquity banshee vim pidgin ghostscript imagemagick xine-lib libav clamav transmission scribus gftp fetchmail},
-                    :baseapps => %w{poppler pulseaudio samba mysql-5.1 bind9 krb5 gstreamer0.10 gst-plugins-good0.10 gst-plugins-base0.10 busybox sane-backends},
-                    :x11 => %w{mesa},
-                    :debian => %w{synaptic}}
+  EXTRA_PACKAGES = {
+    :gnu => %w{gnutls26 texinfo binutils gdb eglibc coreutils gnupg2 mailman tar 
+               readline6},
+    :kernel => %w{iptables ps3-kboot libvirt u-boot qemu-kvm alsa-driver 
+                  syslinux util-linux udev e2fsprogs openhpi reiserfsprogs 
+                  reiser4progs libusb net-tools strace elfutils jfsutils xfsdump 
+                  xfsprogs},
+    :bsd => %w{openssh bsdmainutils},
+    :gnome => %w{gimp gimp-help gcalctool gnome-vfs gvfs gconf-editor libbonobo 
+                 libbonoboui},
+    :misc => %w{likewise-open eucalyptus-commons-ext},
+    :devel => %w{llvm-2.7 llvm-2.8 boost1.42 gccxml subversion bzr icu valgrind 
+                 openssl openldap gwt git tcl8.5 tk8.4 tk8.5 openjdk-6 
+                 openjdk-6b18 php5 db4.8 clutter1.0 sqlite sqlite3 imlib2 libnih
+                 zlib libjpeg8},
+    :kde => %w{k3b ktorrent webkit qtwebkit-source},
+    :userapps => %w{inkscape digikam ubiquity banshee vim pidgin ghostscript 
+                    imagemagick xine-lib libav clamav transmission scribus gftp 
+                    fetchmail rsync bogofilter texi2html virt-manager 
+                    modemmanager openvpn},
+    :baseapps => %w{poppler pulseaudio samba mysql-5.1 bind9 krb5 gstreamer0.10 
+                    gst-plugins-good0.10 gst-plugins-base0.10 busybox 
+                    sane-backends sudo gpsd},
+    :x11 => %w{mesa},
+    :ubuntu => %{installation-guidei usb-creator},
+    :debian => %w{synaptic apt-setup base-installer debconf gdebi devscripts}
+  }
 
   cats = [:other,:misc,:userapps,:baseapps,:gnome,:kde,:gnu,:debian,:ubuntu,
           :apache,:mozilla,:freedesktop,:bsd,:devel,:x11,:kernel]
@@ -54,9 +70,11 @@ create_data do
         sec = :apache
       elsif homepage.include? ".debian.org" or vcsbrowser.include? ".debian.org"
         sec = :apache
+      elsif cmp.to.startswith? "partman"
+        sec = :debian
       elsif cmp.to.startswith? "qt4-" or cmp.to.startswith? "qt-" or cmp.to.startswith? "kde"
         sec = :kde
-      elsif cmp.to.startswith? "gtk" or cmp.to.startswith? "glib" or cmp.to.startswith? "libgnome"
+      elsif cmp.to.startswith? "gtk" or cmp.to.startswith? "gdk" or cmp.to.startswith? "glib" or cmp.to.startswith? "libgnome"
         sec = :gnome
       elsif cmp.to.startswith? "ubuntu" 
         sec = :ubuntu
@@ -81,11 +99,14 @@ create_data do
     end
   end
 
-  puts others.sort{|a,b| a[1] <=> b[1]}.map{|el| el.join(" ")}
+  puts others.sort{|a,b| a[1] <=> b[1]}[-200..-1].map{|el| el.join(" ")}
   $stderr.puts "#{others.size} package in :others"
 
+  sum = results.values.reduce{|acc, el| [acc[0]+el[0],acc[1]+el[1]]}
+  p [results[:gnu][0].to_f/sum[0].to_f,results[:gnu][1].to_f/sum[1].to_f]
+
   File.open(datafile, "w") do |f|    
-    f.puts "SIZE CHURN"
-    cats.each {|cat| f.puts results[cat].join(" ")}
+    f.puts "LABEL SIZE CHURN"
+    cats.each {|cat| f.puts cat.to_s+" "+results[cat].join(" ")}
   end
 end
