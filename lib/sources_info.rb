@@ -105,6 +105,10 @@ class SourcesInfo
     fileobj = nil
     dir = nil
 
+    simple_attrs = {"Section" => :section, "Homepage" => :homepage, 
+                    "Priority" => :priority, "Vcs-Browser" => :vcsbrowser,
+                    "Maintainer" => :maintainer, "Directory" => :directory}
+
     IO.popen("bzcat #{filename}").each do |line|
       if line.include? ":" or line.strip == ""
         in_files_section = false
@@ -115,18 +119,10 @@ class SourcesInfo
       elsif line.startswith? "Package:"
         currpkg = line.split[1]
         @PackageToFile[currpkg] = fileobj = SourcePkg.new(currpkg,@distro)
-      elsif line.startswith? "Section:"
-        fileobj.section = line.split[1].strip
-      elsif line.startswith? "Homepage:"
-        fileobj.homepage = line.split[1].strip
-      elsif line.startswith? "Priority:"
-        fileobj.priority = line.split[1].strip
-      elsif line.startswith? "Vcs-Browser:"
-        fileobj.vcsbrowser = line.split[1].strip
+      elsif simple_attrs.keys.include? (a = line.split(":")[0].strip)
+        fileobj.send(simple_attrs[a].to_s+"=", line.split(":")[1..-1].join(":").strip)
       elsif line.startswith? "Binary:"
         line[8..-1].split(",").each{|bin| fileobj.add_bin(bin.strip, getvotes(bin.strip))}
-      elsif line.startswith? "Directory:"
-        fileobj.directory = line.split[1]
       elsif line.startswith? "Files:"
         in_files_section = true
       end
@@ -194,7 +190,8 @@ class SourcePkg
                  "vala","js","d","f","s","patch","diff","dpatch","mm"]  
   PKG_EXTS = {"tar.gz" => "z", "tgz" => "z", "tar.bz2" => "j", "tar.xz" => "J"}
 
-  attr_accessor :package, :distro, :directory, :section, :homepage, :priority, :vcsbrowser
+  attr_accessor :package, :distro, :directory, :section, :homepage, :priority, 
+                :vcsbrowser, :maintainer
   attr_reader :votes
   def initialize(package, distro, pkgcache="./pkgcache/")
     @package = package

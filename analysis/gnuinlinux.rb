@@ -14,7 +14,7 @@ create_data do
     :kernel => %w{iptables ps3-kboot libvirt u-boot qemu-kvm alsa-driver 
                   syslinux util-linux udev e2fsprogs openhpi reiserfsprogs 
                   reiser4progs libusb net-tools strace elfutils jfsutils xfsdump 
-                  xfsprogs},
+                  xfsprogs crash},
     :bsd => %w{openssh bsdmainutils},
     :gnome => %w{gimp gimp-help gcalctool gnome-vfs gvfs gconf-editor libbonobo 
                  libbonoboui},
@@ -51,6 +51,7 @@ create_data do
       pkg = sinfo2.package_to_file(cmp.to)
       homepage = pkg.homepage||""
       vcsbrowser = pkg.vcsbrowser||""
+      maintainer = pkg.maintainer||""
       EXTRA_PACKAGES.each{|s, pkgs| sec = s if pkgs.include? cmp.to}
       if sec
         # We're done
@@ -64,10 +65,10 @@ create_data do
         sec = :gnome
       elsif homepage.include? ".apache.org"
         sec = :apache
-      elsif homepage.include? ".mozilla.org"
-        sec = :apache
+      elsif homepage.include? ".mozilla.org" or maintainer.include? "mozillateam"
+        sec = :mozilla
       elsif homepage.include? ".freedesktop.org"
-        sec = :apache
+        sec = :freedesktop
       elsif homepage.include? ".debian.org" or vcsbrowser.include? ".debian.org"
         sec = :apache
       elsif cmp.to.startswith? "partman"
