@@ -537,7 +537,7 @@ libgd-gd2-perl,libgd-gd2-perl,perl,perl,4692,4681,504,504,2,76,87
 camlp5,camlp5,devel,devel,15164,15164,154,154,0,512,512
 lsb,lsb,misc,misc,2028,2020,325402,325402,2,56,64
 netcfg,netcfg,debian-installer,debian-installer,62075,65624,0,0,79,10666,7117
-openoffice.org,openoffice.org,editors,editors,13,2868,1274684,76364,6,2868,13
+openoffice.org,openoffice.org,editors,editors,3779,282,1274684,76364,17,282,3779
 language-selector,language-selector,admin,admin,62514,62979,51201,51201,17,1120,655
 libgweather,libgweather,libs,libs,2382032,2382032,263130,263130,0,534,534
 kde-l10n-ar,kde-l10n-ar,kde,kde,466601,483328,0,0,416,113104,96377

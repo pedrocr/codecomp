@@ -4,16 +4,16 @@ lm(formula = CHURN ~ log(SIZE))
 
 Residuals:
     Min      1Q  Median      3Q     Max 
--18.631 -11.483  -8.098   4.261  93.338 
+-18.643 -11.488  -8.101   4.252  93.337 
 
 Coefficients:
             Estimate Std. Error t value Pr(>|t|)    
-(Intercept) 29.19739    0.85647   34.09   <2e-16 ***
-log(SIZE)   -1.76656    0.08617  -20.50   <2e-16 ***
+(Intercept) 29.21347    0.85662   34.10   <2e-16 ***
+log(SIZE)   -1.76771    0.08618  -20.51   <2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1 
 
-Residual standard error: 18.74 on 7833 degrees of freedom
-Multiple R-squared: 0.05093,	Adjusted R-squared: 0.05081 
-F-statistic: 420.3 on 1 and 7833 DF,  p-value: < 2.2e-16 
+Residual standard error: 18.74 on 7834 degrees of freedom
+Multiple R-squared: 0.05097,	Adjusted R-squared: 0.05084 
+F-statistic: 420.7 on 1 and 7834 DF,  p-value: < 2.2e-16 
 
