@@ -190,8 +190,9 @@ class FileInfo
 end
 
 class SourcePkg
-  SOURCE_EXTS = ["c","cc","h","rb","py","cs","java","pl","xs","php","sh",
-                 "vala","js","d","f","s"]  
+  SOURCE_EXTS = ["c","cc","cpp","h","rb","py","cs","java","pl","xs","php","sh",
+                 "vala","js","d","f","s","patch","diff","dpatch","mm"]  
+  PKG_EXTS = {"tar.gz" => "z", "tgz" => "z", "tar.bz2" => "j", "tar.xz" => "J"}
 
   attr_accessor :package, :distro, :directory, :section, :homepage, :priority, :vcsbrowser
   attr_reader :votes
@@ -220,19 +221,28 @@ class SourcePkg
     @files.find{|f| f.type == :dsc}
   end
 
-  def download(dest_dir=".")
+  def download(destdir=".")
     @files.each{|f| get_from_archive(f)}
 
     #Unpack using dpkg-source
-    Util.run_cmd "dpkg-source -x --no-copy #{get_from_archive(dsc)} #{dest_dir}"
+    Util.run_cmd "dpkg-source -x --no-copy #{get_from_archive(dsc)} #{destdir}"
+
+    #Extract all packages from inside the package (complex packages like firefox
+    #or openoffice have the upstream packages inside the debian packaging)
+    PKG_EXTS.each do |ext, flag|
+      IO.popen("find #{destdir} -name \"*.#{ext}\"").each do |file|
+        file = file.strip
+        Util.run_cmd "tar -C #{File.dirname(file)} -#{flag}xf #{file}"
+      end
+    end
 
     #Remove all non-source files
     extensions = SOURCE_EXTS+SOURCE_EXTS.map{|e| e.upcase}
     ext_cond = extensions.map{|e| "-not -name \"*.#{e}\""}.join(" ")
     
-    File.open("#{dest_dir}/deleted_files", "w") do |f|
-      ["find #{dest_dir} -type l",
-       "find #{dest_dir} #{ext_cond} -not -type d"].each do |cmd|
+    File.open("#{destdir}/deleted_files", "w") do |f|
+      ["find #{destdir} -type l",
+       "find #{destdir} #{ext_cond} -not -type d"].each do |cmd|
         IO.popen(cmd).each do |line|
           line = line.strip
           if not line.endswith? "deleted_files"

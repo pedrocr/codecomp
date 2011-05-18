@@ -537,7 +537,6 @@ libgd-gd2-perl,libgd-gd2-perl,perl,perl,4692,4681,504,504,2,76,87
 camlp5,camlp5,devel,devel,15164,15164,154,154,0,512,512
 lsb,lsb,misc,misc,2028,2020,325402,325402,2,56,64
 netcfg,netcfg,debian-installer,debian-installer,62075,65624,0,0,79,10666,7117
-openoffice.org,openoffice.org,editors,editors,3779,282,1274684,76364,17,282,3779
 language-selector,language-selector,admin,admin,62514,62979,51201,51201,17,1120,655
 libgweather,libgweather,libs,libs,2382032,2382032,263130,263130,0,534,534
 kde-l10n-ar,kde-l10n-ar,kde,kde,466601,483328,0,0,416,113104,96377
@@ -1432,7 +1431,6 @@ gettext,gettext,devel,devel,1199610,1199610,119096,119096,0,1456,1456
 dict-zu,dict-zu,text,text,4160,4160,56,56,0,127,127
 kpackagekit,kpackagekit,libs,libs,157392,153525,12288,12288,125,73628,77459
 ifrench,ifrench,text,text,33,33,18,18,0,33,33
-nil,libreoffice,,editors,0,1,0,212634,0,0,0
 tipa,tipa,tex,tex,5696,5696,2643,2643,0,278,278
 noweb,noweb,devel,devel,7928,7928,54,54,0,326,326
 xdg-user-dirs,xdg-user-dirs,utils,utils,8604,10507,154433,154433,70,2203,300
@@ -1570,6 +1568,7 @@ xdg-utils,xdg-utils,utils,utils,2120,2135,92770,92770,2,158,143
 hicolor-icon-theme,hicolor-icon-theme,misc,misc,30,8,134732,134732,2,8,30
 debian-installer,debian-installer,devel,devel,84756,85088,0,0,80,2452,2120
 tiff,tiff,libs,libs,113693,113693,178497,178497,0,199,199
+openoffice.org,openoffice.org,editors,editors,3779,282,1274684,288998,17,282,3779
 x11-session-utils,x11-session-utils,x11,x11,12477,12670,19724,19724,28,676,483
 tgt,tgt,net,net,44570,49117,4,4,48,6862,2315
 ibus-hangul,ibus-hangul,utils,utils,10084,10084,160,160,0,52,52
@@ -1856,7 +1855,7 @@ tomboy,tomboy,x11,x11,249155,256083,132071,132071,77,17980,11052
 kde-l10n-hu,kde-l10n-hu,kde,kde,461333,486405,1,1,645,125890,100818
 fortune-mod,fortune-mod,games,games,2989,2989,21222,21222,0,107,107
 libconvert-asn1-perl,libconvert-asn1-perl,perl,perl,158,158,423,423,0,56,56
-firefox,firefox,web,web,5682,6174,239933,239934,69,4397,3905
+firefox,firefox,web,web,5540789,6232745,239933,239934,16351,1713390,1021494
 openoffice.org-en-au,openoffice.org-en-au,text,text,202,202,195,195,0,24,24
 swedish,swedish,text,text,387,387,153,153,0,81,81
 dsdo,dsdo,text,text,17,17,180,180,0,17,17
