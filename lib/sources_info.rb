@@ -114,7 +114,7 @@ class SourcesInfo
         fileobj.add_file FileInfo.new(filename, md5, size)
       elsif line.startswith? "Package:"
         currpkg = line.split[1]
-        @PackageToFile[currpkg] = fileobj = SourcePkg.new(currpkg)
+        @PackageToFile[currpkg] = fileobj = SourcePkg.new(currpkg,@distro)
       elsif line.startswith? "Section:"
         fileobj.section = line.split[1].strip
       elsif line.startswith? "Homepage:"
@@ -190,18 +190,18 @@ class FileInfo
 end
 
 class SourcePkg
-  SOURCE_EXTS = ["c","cc","h","rb","py","cs","java","pl", "xs", "php","sh","vala",
-                 "xml","po",".js","ui","glade","css","d","desktop","f","html",
-                 "yml", ".json", "tex", "txt", "s", "diff", "patch", "dpatch"]  
+  SOURCE_EXTS = ["c","cc","h","rb","py","cs","java","pl","xs","php","sh",
+                 "vala","js","d","f","s"]  
 
-  attr_accessor :package, :directory, :section, :homepage, :priority, :vcsbrowser
+  attr_accessor :package, :distro, :directory, :section, :homepage, :priority, :vcsbrowser
   attr_reader :votes
-  def initialize(package, pkgcache="./pkgcache/")
+  def initialize(package, distro, pkgcache="./pkgcache/")
     @package = package
     @directory = nil
     @pkgcache = pkgcache
     @files = []
     @votes = 0
+    @distro = distro
   end
 
   def add_file(finfo)
@@ -216,58 +216,32 @@ class SourcePkg
     @files.find{|f| f.type == :orig}
   end
   
-  def diff
-    @files.find{|f| f.type == :diff}
+  def dsc
+    @files.find{|f| f.type == :dsc}
   end
 
-  def download(distname, dest_dir=".")
-    Util.fatal_error "No source file for #{@package} in #{distname}" if !orig
-    origfile = get_from_archive(orig)
-    difffile = get_from_archive(diff) if diff
-    dflag = {"gz" => "z", "bz2" => "j", "xz" => "J"}[orig.filename.split(".")[-1]]
-    Util.fatal_error "Unknown compressed file type #{orig.filename}" if !dflag
+  def download(dest_dir=".")
+    @files.each{|f| get_from_archive(f)}
 
-    #Unpack the original file
-    origdir = orig.filename.sub(".tar.gz", "").sub(".tar.bz2", "")
-    FileUtils.mkdir tmpdir = dest_dir+"/"+origdir+"-"+distname+".tmpdir"
-    Util.run_cmd "tar -C #{tmpdir} -#{dflag}xpf #{origfile}"
-    
-    tardir = tmpdir
-    # Sometimes packages don't unpack into a new folder (newentries.size > 3)
-    newentries = Dir.entries(tmpdir)
-    extradir = newentries.find{|d| d != "." && d != ".."}
-    newdir = tardir+"/"+extradir
-    tardir = newdir if newentries.size <= 3 and File.directory?(newdir)
-
-    #Apply the diff if it exists
-    if diff
-      cat = {"gz" => "zcat", "bz2" => "bzcat", "xz" => "xzcat"}[diff.filename.split(".")[-1]]
-      Util.fatal_error "Unknown compressed file type #{diff}" if !cat
-      Util.run_cmd "#{cat} #{difffile} | patch -s -p1 -d #{tardir}"
-    end
+    #Unpack using dpkg-source
+    Util.run_cmd "dpkg-source -x --no-copy #{get_from_archive(dsc)} #{dest_dir}"
 
     #Remove all non-source files
     extensions = SOURCE_EXTS+SOURCE_EXTS.map{|e| e.upcase}
     ext_cond = extensions.map{|e| "-not -name \"*.#{e}\""}.join(" ")
     
-    delete_files = File.open("#{tardir}/deleted_files", "w")
-    ["find #{tardir} -type l",
-     "find #{tardir} #{ext_cond} -not -type d"].each do |cmd|
-      IO.popen(cmd).each do |line|
-        line = line.strip
-        if not line.endswith? "deleted_files"
-          delete_files.puts line
-          FileUtils.rm line
+    File.open("#{dest_dir}/deleted_files", "w") do |f|
+      ["find #{dest_dir} -type l",
+       "find #{dest_dir} #{ext_cond} -not -type d"].each do |cmd|
+        IO.popen(cmd).each do |line|
+          line = line.strip
+          if not line.endswith? "deleted_files"
+            f.puts line
+            FileUtils.rm line
+          end
         end
       end
     end
-    delete_files.close
-
-    #Move directory into its final naming
-    finaldir = dest_dir+"/"+origdir+"-"+distname
-    FileUtils.mv(tardir, finaldir)
-    FileUtils.rmdir tmpdir if File.exists? tmpdir
-    finaldir
   end
 
   private 
