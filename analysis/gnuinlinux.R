@@ -1,0 +1,4 @@
+SIZEPER <- SIZE/sum(SIZE)
+CHURNPER <- CHURN/sum(CHURN)
+
+barplot(cbind(SIZEPER,CHURNPER))

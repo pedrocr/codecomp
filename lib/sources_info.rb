@@ -117,6 +117,12 @@ class SourcesInfo
         @PackageToFile[currpkg] = fileobj = SourcePkg.new(currpkg)
       elsif line.startswith? "Section:"
         fileobj.section = line.split[1].strip
+      elsif line.startswith? "Homepage:"
+        fileobj.homepage = line.split[1].strip
+      elsif line.startswith? "Priority:"
+        fileobj.priority = line.split[1].strip
+      elsif line.startswith? "Vcs-Browser:"
+        fileobj.vcsbrowser = line.split[1].strip
       elsif line.startswith? "Binary:"
         line[8..-1].split(",").each{|bin| fileobj.add_bin(bin.strip, getvotes(bin.strip))}
       elsif line.startswith? "Directory:"
@@ -188,7 +194,7 @@ class SourcePkg
                  "xml","po",".js","ui","glade","css","d","desktop","f","html",
                  "yml", ".json", "tex", "txt", "s", "diff", "patch", "dpatch"]  
 
-  attr_accessor :package, :directory, :section
+  attr_accessor :package, :directory, :section, :homepage, :priority, :vcsbrowser
   attr_reader :votes
   def initialize(package, pkgcache="./pkgcache/")
     @package = package

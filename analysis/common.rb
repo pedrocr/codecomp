@@ -13,22 +13,31 @@ class CompResult
     end
   end
   
-  def self.each(opts={})
-    DISTPAIRS.each do |dist1, dist2|
-      names = nil
-      FasterCSV.foreach(GENDIR+"comparisons/#{dist1}_#{dist2}") do |row|
-        if !names
-          names = row
+  def self.each(opts={}, &block)
+    if opts[:dist1] and opts[:dist2]
+      iterate_dists(opts[:dist1],opts[:dist2],opts, &block)
+    else
+      DISTPAIRS.each do |dist1, dist2|
+        iterate_dists(dist1,dist2,opts, &block)
+      end
+    end
+  end
+
+  private 
+  def self.iterate_dists(dist1,dist2,opts)
+    names = nil
+    FasterCSV.foreach(GENDIR+"comparisons/#{dist1}_#{dist2}") do |row|
+      if !names
+        names = row
+      else
+        if opts[:with_dists]
+          yield CompResult.new(names,row), dist1, dist2
         else
-          if opts[:with_dists]
-            yield CompResult.new(names,row), dist1, dist2
-          else
-            yield CompResult.new(names,row)
-          end
+          yield CompResult.new(names,row)
         end
       end
-    end       
-  end
+    end
+  end       
 end
 
 class RTask
@@ -86,7 +95,8 @@ class RTask
     $stderr.puts "Running #{rfile}"
     IO.popen("R --slave --vanilla","w+") do |proc|
       proc.puts("pdf(file=\"#{GENDIR}#{@name}/Rplots.pdf\",width=9,height=5)")
-      proc.puts("attach(read.table(\"#{dfile}\", header=TRUE),name=\"datafile\")")
+      proc.puts("DATA <- read.table(\"#{dfile}\", header=TRUE)")
+      proc.puts("attach(DATA)")
       proc.puts File.read(rfile)
       proc.close_write
       output = proc.read
