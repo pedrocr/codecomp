@@ -37,7 +37,7 @@ class SourceBundle
   end
 
   def pkg
-    @matches.sort[-1]
+    @matches[-1]
   end 
 
   def section
@@ -50,7 +50,13 @@ class SourceBundle
 
   private
   def find_all_matching_srcs(exprs, sinfo)
-    sinfo.find_all{|src| exprs.map{|e| Util.match_expansion(e, src)}.inject{|a,b| a or b}}
+    matches = Array.new(exprs.size){Array.new}
+    sinfo.each do |src| 
+      exprs.each_with_index do |e,i| 
+        matches[i] << src if Util.match_expansion(e, src)
+      end
+    end
+    matches.flatten
   end
 end
 
@@ -119,7 +125,7 @@ class SourcesInfo
       elsif line.startswith? "Package:"
         currpkg = line.split[1]
         @PackageToFile[currpkg] = fileobj = SourcePkg.new(currpkg,@distro)
-      elsif simple_attrs.keys.include? (a = line.split(":")[0].strip)
+      elsif simple_attrs.keys.include?(a = line.split(":")[0].strip)
         fileobj.send(simple_attrs[a].to_s+"=", line.split(":")[1..-1].join(":").strip)
       elsif line.startswith? "Binary:"
         line[8..-1].split(",").each{|bin| fileobj.add_bin(bin.strip, getvotes(bin.strip))}
@@ -162,6 +168,13 @@ class SourcesInfo
     return nil if not src
     @wildcard_bundles.each {|b| return b if b.match? src}
     @simple_bundles[src] ||= SourceBundle.new(self, :src=>src)
+  end
+
+  def inspect
+    to_s
+  end
+  def to_s
+    "<SourcesInfo: #{@distro}>"
   end
 end
 

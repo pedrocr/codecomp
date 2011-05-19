@@ -30,4 +30,16 @@ class SourcesInfoTest < Test::Unit::TestCase
     assert_instance_of SourceBundle, bundle
     assert_equal 111, bundle.votes 
   end
+
+  def test_bundle_matching
+    @maverick ||= SourcesInfo.new("maverick")
+    @natty ||= SourcesInfo.new("natty")
+    RuleEngine.new(@maverick, @natty)
+
+    assert_equal "openoffice.org", @maverick.src_to_bundle("openoffice.org").pkg
+    assert_equal "libreoffice",@natty.src_to_bundle("openoffice.org").pkg
+
+    assert_equal "db4.8", @maverick.src_to_bundle("db4.8").pkg
+    assert_equal "db",@natty.src_to_bundle("db4.8").pkg
+  end
 end

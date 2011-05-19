@@ -18,7 +18,6 @@ xfonts-75dpi,nil,x11,,929,0,0,0,3,0,929
 libtest-deep-perl,libtest-deep-perl,perl,perl,137,145,28,28,3,127,119
 evolution-webcal,evolution-webcal,gnome,gnome,13811,13880,2985,2985,37,1708,1639
 ispell.pt,ispell.pt,text,text,18,17,210,210,0,17,18
-db4.8,db4.8,libs,libs,1122523,1122523,146869,2307,0,3331,3331
 kde-l10n-ru,kde-l10n-ru,kde,kde,540748,568749,3,3,714,143718,115715
 laptop-detect,laptop-detect,utils,utils,11,11,67315,67315,0,11,11
 beep,beep,sound,sound,1708,1708,567,567,0,27,27
@@ -1058,7 +1057,7 @@ mkvmlinuz,mkvmlinuz,devel,devel,5364,5364,2,2,0,19,19
 plasma-widget-message-indicator,plasma-widget-message-indicator,kde,kde,677,677,63,63,4,17,17
 rus-ispell,rus-ispell,text,text,110,110,811,811,0,40,40
 qimageblitz,qimageblitz,libs,libs,3628,2113,282,282,4,21,1536
-gcc-defaults,gcc-defaults,devel,devel,834,836,1182936,1286061,0,55,53
+gcc-4.5,gcc-4.5,devel,devel,5653661,5721558,1182936,1286061,88733,5672433,5604536
 xfonts-base,xfonts-base,x11,x11,1192,1192,0,0,0,289,289
 powermgmt-base,powermgmt-base,utils,utils,123,123,165683,165683,0,20,20
 openssl,openssl,utils,utils,399738,399738,314734,314734,0,914,914
@@ -1365,6 +1364,7 @@ hevea,hevea,tex,tex,450,450,99,99,0,258,258
 mbr,mbr,admin,admin,2962,2962,435,435,0,51,51
 mozilla-devscripts,mozilla-devscripts,devel,devel,769,769,105,105,0,78,78
 mockobjects,mockobjects,devel,devel,28312,28312,425,425,0,8,8
+firefox,firefox,web,web,5540789,6232745,239933,239934,16351,1713390,1021494
 gedit,gedit,gnome,gnome,755718,759687,94340,94340,55,13407,9438
 gle,gle,graphics,graphics,23354,23354,1767,1767,0,174,174
 pyicu,pyicu,python,python,1510,2348,1124,1124,27,911,73
@@ -1568,7 +1568,6 @@ xdg-utils,xdg-utils,utils,utils,2120,2135,92770,92770,2,158,143
 hicolor-icon-theme,hicolor-icon-theme,misc,misc,30,8,134732,134732,2,8,30
 debian-installer,debian-installer,devel,devel,84756,85088,0,0,80,2452,2120
 tiff,tiff,libs,libs,113693,113693,178497,178497,0,199,199
-openoffice.org,openoffice.org,editors,editors,3779,282,1274684,288998,17,282,3779
 x11-session-utils,x11-session-utils,x11,x11,12477,12670,19724,19724,28,676,483
 tgt,tgt,net,net,44570,49117,4,4,48,6862,2315
 ibus-hangul,ibus-hangul,utils,utils,10084,10084,160,160,0,52,52
@@ -1638,7 +1637,7 @@ nil,libesmtp,,libs,0,23202,0,7,58,23202,0
 nagios-nrpe,nagios-nrpe,net,net,4877,4877,355,355,0,48,48
 flute-openoffice.org,flute-openoffice.org,libs,libs,11300,11300,30,30,0,10,10
 ipvsadm,ipvsadm,net,net,6245,6271,14,14,20,95,69
-postgresql-common,postgresql-common,misc,misc,1454,1455,47972,47972,0,79,78
+postgresql-8.4,postgresql-8.4,database,database,919874,922521,47972,47972,147,21721,19074
 bittornado,bittornado,net,net,20318,20318,2982,2982,0,125,125
 libfont-afm-perl,libfont-afm-perl,perl,perl,45,45,2125,2125,0,25,25
 rekonq,rekonq,kde,kde,63686,77614,105,105,141,30071,16143
@@ -1851,11 +1850,11 @@ ispell-gl,ispell-gl,text,text,816,816,99,99,0,35,35
 d-conf,d-conf,libs,libs,15915,20994,0,0,40,8124,3045
 userconfig,userconfig,admin,admin,4448,4448,0,0,0,3,3
 slang2,slang2,devel,devel,1,1,89756,89756,0,0,0
+openoffice.org,libreoffice,editors,editors,7443427,13750405,1274684,288998,65561,13748582,7441455
 tomboy,tomboy,x11,x11,249155,256083,132071,132071,77,17980,11052
 kde-l10n-hu,kde-l10n-hu,kde,kde,461333,486405,1,1,645,125890,100818
 fortune-mod,fortune-mod,games,games,2989,2989,21222,21222,0,107,107
 libconvert-asn1-perl,libconvert-asn1-perl,perl,perl,158,158,423,423,0,56,56
-firefox,firefox,web,web,5540789,6232745,239933,239934,16351,1713390,1021494
 openoffice.org-en-au,openoffice.org-en-au,text,text,202,202,195,195,0,24,24
 swedish,swedish,text,text,387,387,153,153,0,81,81
 dsdo,dsdo,text,text,17,17,180,180,0,17,17
@@ -1951,6 +1950,7 @@ python-reportlab,python-reportlab,python,python,119939,123914,40149,40149,166,85
 pyao,pyao,interpreters,interpreters,671,671,96,96,0,14,14
 kde-l10n-th,kde-l10n-th,kde,kde,313256,381766,0,0,396,135368,66858
 libraw1394,libraw1394,libs,libs,16130,16597,114657,114657,9,1332,865
+db4.8,db,libs,libs,547185,928291,146869,2307,3048,898791,517689
 kde-l10n-fi,kde-l10n-fi,kde,kde,467340,483547,0,0,496,122289,106082
 java-access-bridge,java-access-bridge,libs,libs,13908,13908,72106,72106,0,86,86
 pycairo,pycairo,python,python,15885,15885,156574,156574,0,44,44
