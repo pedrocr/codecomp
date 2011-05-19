@@ -9,7 +9,7 @@ create_data do
   sinfo2 = SourcesInfo.new(dist2)
 
   EXTRA_PACKAGES = {
-    :gnu => %w{gnutls26 texinfo binutils gdb eglibc coreutils gnupg2 mailman tar 
+    :gnu => %w{gnutls26 texinfo binutils gdb eglibc coreutils gnupg gnupg2 mailman tar 
                readline6},
     :kernel => %w{iptables ps3-kboot libvirt u-boot qemu-kvm alsa-driver 
                   syslinux util-linux udev e2fsprogs openhpi reiserfsprogs 
@@ -21,23 +21,24 @@ create_data do
     :misc => %w{likewise-open eucalyptus-commons-ext},
     :devel => %w{llvm-2.7 llvm-2.8 boost1.42 gccxml subversion bzr icu valgrind 
                  openssl openldap gwt git tcl8.5 tk8.4 tk8.5 openjdk-6 
-                 openjdk-6b18 php5 db4.8 clutter1.0 sqlite sqlite3 imlib2 libnih
-                 zlib libjpeg8},
+                 openjdk-6b18 php5 db4.8 db libxml libxml2 clutter1.0 sqlite sqlite3 imlib2 libnih
+                 zlib libjpeg8 clutter-1.0},
     :kde => %w{k3b ktorrent webkit qtwebkit-source},
     :userapps => %w{inkscape digikam ubiquity banshee vim pidgin ghostscript 
                     imagemagick xine-lib libav clamav transmission scribus gftp 
                     fetchmail rsync bogofilter texi2html virt-manager 
-                    modemmanager openvpn},
+                    modemmanager openvpn bouncycastle},
     :baseapps => %w{poppler pulseaudio samba mysql-5.1 bind9 krb5 gstreamer0.10 
                     gst-plugins-good0.10 gst-plugins-base0.10 busybox 
-                    sane-backends sudo gpsd},
+                    sane-backends sudo gpsd postgresql-8.4 gutenprint cups},
     :x11 => %w{mesa},
     :ubuntu => %{installation-guidei usb-creator},
-    :debian => %w{synaptic apt-setup base-installer debconf gdebi devscripts}
+    :debian => %w{synaptic apt-setup base-installer debconf gdebi devscripts 
+                  aptitude}
   }
 
-  cats = [:other,:misc,:userapps,:baseapps,:gnome,:kde,:gnu,:debian,:ubuntu,
-          :apache,:mozilla,:freedesktop,:bsd,:devel,:x11,:kernel]
+  cats = [:other,:misc,:userapps,:openoffice,:baseapps,:gnome,:kde,:gnu,:debian,
+          :ubuntu,:apache,:mozilla,:freedesktop,:bsd,:devel,:x11,:kernel]
   results = {}
   cats.each{|cat| results[cat] = [0,0]}
   
@@ -59,6 +60,8 @@ create_data do
         sec = nil
       elsif homepage.include? ".gnu.org" or homepage.include? ".fsf.org"
         sec = :gnu
+      elsif cmp.to.startswith? "openoffice" or cmp.to.startswith? "libreoffice"
+        sec = :openoffice
       elsif ["x11","gnome","kde","kernel"].include? section
         sec = section.to_sym
       elsif homepage.include? ".gnome.org"
@@ -69,8 +72,8 @@ create_data do
         sec = :mozilla
       elsif homepage.include? ".freedesktop.org"
         sec = :freedesktop
-      elsif homepage.include? ".debian.org" or vcsbrowser.include? ".debian.org"
-        sec = :apache
+      elsif homepage.include? ".debian.org"
+        sec = :debian
       elsif cmp.to.startswith? "partman"
         sec = :debian
       elsif cmp.to.startswith? "qt4-" or cmp.to.startswith? "qt-" or cmp.to.startswith? "kde"
