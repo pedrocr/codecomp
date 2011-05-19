@@ -22,15 +22,16 @@ create_data do
     :devel => %w{llvm-2.7 llvm-2.8 boost1.42 gccxml subversion bzr icu valgrind 
                  openssl openldap gwt git tcl8.5 tk8.4 tk8.5 openjdk-6 
                  openjdk-6b18 php5 db4.8 db libxml libxml2 clutter1.0 sqlite sqlite3 imlib2 libnih
-                 zlib libjpeg8 clutter-1.0},
+                 zlib libjpeg8 clutter-1.0 cairo libgphoto2 cmake},
     :kde => %w{k3b ktorrent webkit qtwebkit-source},
     :userapps => %w{inkscape digikam ubiquity banshee vim pidgin ghostscript 
                     imagemagick xine-lib libav clamav transmission scribus gftp 
                     fetchmail rsync bogofilter texi2html virt-manager 
-                    modemmanager openvpn bouncycastle},
+                    modemmanager openvpn bouncycastle bacula},
     :baseapps => %w{poppler pulseaudio samba mysql-5.1 bind9 krb5 gstreamer0.10 
                     gst-plugins-good0.10 gst-plugins-base0.10 busybox 
-                    sane-backends sudo gpsd postgresql-8.4 gutenprint cups},
+                    sane-backends sudo gpsd postgresql-8.4 gutenprint cups
+                    virtuoso-opensource packagekit},
     :x11 => %w{mesa},
     :ubuntu => %{installation-guidei usb-creator},
     :debian => %w{synaptic apt-setup base-installer debconf gdebi devscripts 
