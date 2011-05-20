@@ -71,6 +71,7 @@ class SourcesInfo
     @wildcard_bundles = []
     @ignore_srcs = []
     @distro = distro
+    @use_paths = {}
 
     #FIXME: use a different file per distro
     if opts[:popconfile]
@@ -136,7 +137,11 @@ class SourcesInfo
   end
 
   def bin_to_package(bin); @BinToPackage[bin]; end
-  def package_to_file(pkg); @PackageToFile[pkg]; end
+  def package_to_file(pkg);
+    p = @PackageToFile[pkg];
+    p.upath = (@use_paths.find{|e,path| Util.match_expansion(e,pkg)}||[nil,nil])[1] if p
+    p
+  end
   def include_bin?(bin); @BinToPackage.include? bin; end
   def include_src?(src); @PackageToFile.include? src; end
 
@@ -146,6 +151,10 @@ class SourcesInfo
 
   def add_wildcard_bundle(exprs)
     @wildcard_bundles << SourceBundle.new(self, :exprs=>exprs)
+  end
+
+  def add_use_path(expr, path)
+    @use_paths[expr] = path
   end
 
   def ignore_srcs(srcs)
@@ -204,12 +213,13 @@ class SourcePkg
   PKG_EXTS = {"tar.gz" => "z", "tgz" => "z", "tar.bz2" => "j", "tar.xz" => "J"}
 
   attr_accessor :package, :distro, :directory, :section, :homepage, :priority, 
-                :vcsbrowser, :maintainer
+                :vcsbrowser, :maintainer, :upath
   attr_reader :votes
-  def initialize(package, distro, pkgcache="./pkgcache/")
+  def initialize(package, distro, opts={})
     @package = package
     @directory = nil
-    @pkgcache = pkgcache
+    @pkgcache = opts[:pkgcache]||File.expand_path("../pkgcache/",File.dirname(__FILE__))
+    @upath = nil
     @files = []
     @votes = 0
     @distro = distro
@@ -261,6 +271,16 @@ class SourcePkg
           end
         end
       end
+    end
+
+    # Copy only the selected files if use_path has been used in the rules 
+    # for this package
+    if @upath
+      tmpdir = "#{destdir}.use_path"
+      FileUtils.mkdir_p tmpdir
+      Util.run_cmd "mv #{destdir}/#{@upath}/* #{tmpdir}/"
+      Util.run_cmd "rm -fr #{destdir}"
+      Util.run_cmd "mv #{tmpdir} #{destdir}"
     end
   end
 

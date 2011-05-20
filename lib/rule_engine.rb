@@ -19,6 +19,11 @@ class RuleEngine
     @sinfo2.add_wildcard_bundle(exprs)
   end
 
+  def use_path(expr, path)
+    @sinfo1.add_use_path(expr, path)
+    @sinfo2.add_use_path(expr, path)
+  end
+
   def ignore_src(src1, *srcs)
     @sinfo1.ignore_srcs(srcs.unshift(src1))
     @sinfo2.ignore_srcs(srcs.unshift(src1))

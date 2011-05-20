@@ -18,6 +18,12 @@ same_src "kdebluetooth", "kbluetooth"
 same_src "wine", "wine1.2"
 same_src "openoffice.org", "libreoffice"
 
+# That's quite a build system you've got there buddy!
+# Make the openoffice comparisons (somewhat sane).
+
+use_path "openoffice.org", "sources/*/"
+use_path "libreoffice", "sources/*/"
+
 # Not really code
 ignore_src "iso-codes"
 ignore_src "language-support-*", "language-pack-*"
