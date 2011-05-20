@@ -2,10 +2,8 @@ require "utils"
 
 class DummyFile
   # Dummy download to compare to nothing
-  def download(sources, basedir)
-    dir = basedir+"/nil"
+  def download(dir)
     FileUtils.mkdir_p dir
-    dir
   end
 end
 
