@@ -252,7 +252,8 @@ class SourcePkg
     PKG_EXTS.each do |ext, flag|
       IO.popen("find #{destdir} -name \"*.#{ext}\"").each do |file|
         file = file.strip
-        Util.run_cmd "tar -C #{File.dirname(file)} -#{flag}xf #{file}"
+        r = Util.run_cmd("tar -C #{File.dirname(file)} -#{flag}xf #{file}",false)
+        Util.warn "unpacking #{file} failed" if !r
       end
     end
 
@@ -272,6 +273,7 @@ class SourcePkg
         end
       end
     end
+    FileUtils.rm destdir+"/deleted_files"
 
     # Copy only the selected files if use_path has been used in the rules 
     # for this package

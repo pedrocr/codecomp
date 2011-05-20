@@ -28,7 +28,7 @@ class Comparator
       Util.run_cmd "cat #{resultfile}.diff | diffstat -b -f 0 | tail -n 1 >> #{resultfile}"
       Util.run_cmd "echo -n \"diffstat -m: \" >> #{resultfile}"
       Util.run_cmd "cat #{resultfile}.diff | diffstat -m -b -f 0 | tail -n 1 >> #{resultfile}"
-      FileUtils.rm resultfile+".diff"
+      #FileUtils.rm resultfile+".diff"
       FileUtils.rm_rf tmpdir
     end
   end
