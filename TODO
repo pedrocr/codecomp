@@ -1,6 +1,4 @@
 Priority
-Remove xml files from diffs
-Run two diffstat's one with -w to try and get better diff metrics
 
 Short-Term
 
