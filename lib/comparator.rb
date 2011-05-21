@@ -23,7 +23,7 @@ class Comparator
       run_cmd_size_of_dir("From:", pkg1, dir1, resultfile)
       run_cmd_size_of_dir("To:", pkg2, dir2, resultfile)
       # Diff exits with code 1 on differences hence the || [... bit
-      Util.run_cmd "diff -uNr #{dir1} #{dir2} > #{resultfile}.diff || [ \"$?\" -eq 1 ]"
+      Util.run_cmd "diff -auNr #{dir1} #{dir2} > #{resultfile}.diff || [ \"$?\" -eq 1 ]"
       Util.run_cmd "echo -n \"diffstat: \" >> #{resultfile}"
       Util.run_cmd "cat #{resultfile}.diff | diffstat -b -f 0 | tail -n 1 >> #{resultfile}"
       Util.run_cmd "echo -n \"diffstat -m: \" >> #{resultfile}"
