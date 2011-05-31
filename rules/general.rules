@@ -21,11 +21,17 @@ same_src "openoffice.org", "libreoffice"
 # That's quite a build system you've got there buddy!
 # Make the openoffice comparisons (somewhat sane).
 
-use_path "openoffice.org", "sources/*/"
-use_path "libreoffice", "sources/*/"
+#use_path "openoffice.org", "sources/*/"
+#use_path "libreoffice", "sources/*/"
 
 # Not really code
 ignore_src "iso-codes"
 ignore_src "language-support-*", "language-pack-*"
+ignore_src "*l10n*"
+
+# Duplicate copies of the kernel
+ignore_src "linux-qcm-msm", "linux-ti-omap4" 
+# Not really code
+ignore_src "linux-firmware"
 
  

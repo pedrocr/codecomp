@@ -166,7 +166,7 @@ class SourcesInfo
   end
 
   def find_ignore_src_match(src)
-    @ignore_srcs.map{|e| Util.match_expansion(e, src)}.inject{|a,b| a or b}
+    @ignore_srcs.map{|e| Util.match_expansion(e, src)}.reduce(:|)
   end
 
   def bundles
