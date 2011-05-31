@@ -1,8 +1,10 @@
 desc "figure out how much of Ubuntu is GNU"
 
 run_R
+png 0, "totalsplit", ["-trim", "-geometry 400x9990"]
+png 1, "gnusplit", ["-trim", "-geometry 400x9999"]
 
-create_data do
+create_data(2) do
   $stderr.puts "Running gnuinlinux"
   dist1 = "maverick"
   dist2 = "natty"
@@ -45,16 +47,17 @@ create_data do
                     xapian-bindings xapian-core drools openbabel hsqldb curl
                     ncurses hplip avahi pango1.0 gegl nas blas foomatic-db
                     libvorbis orbit2 klibc gupnp u-boot},
-    :x11 => %w{mesa},
+    :xorg => %w{mesa},
     :ubuntu => %{installation-guidei usb-creator upstart},
     :debian => %w{synaptic apt-setup base-installer debconf gdebi devscripts 
                   aptitude apt tasksel debian-installer},
     :ignore => %w{linux-backports-modules-2.6.38 llvm-2.7 openjdk-6}
   }
 
-  cats = [:other,:misc,:userapps,:openoffice,:baseapps,:java,:gnome,:kde,:gnu,:debian,
-          :ubuntu,:apache,:mozilla,:freedesktop,:bsd,:devel,:x11,:kernelaid,:kernel]
+  cats = [:other,:misc,:userapps,:libreoffice,:baseapps,:java,:gnome,:kde,:gnu,:debian,
+          :ubuntu,:apache,:mozilla,:freedesktop,:bsd,:devel,:xorg,:kernelaid,:kernel]
   results = {}
+  gnupkgs = {}
   cats.each{|cat| results[cat] = [0,0]}
   
   others = []
@@ -76,7 +79,7 @@ create_data do
       elsif homepage.include? ".gnu.org" or homepage.include? ".fsf.org"
         sec = :gnu
       elsif cmp.to.startswith? "openoffice" or cmp.to.startswith? "libreoffice"
-        sec = :openoffice
+        sec = :libreoffice
       elsif homepage.include? ".gnome.org"
         sec = :gnome
       elsif homepage.include? ".apache.org"
@@ -97,10 +100,12 @@ create_data do
         sec = :ubuntu
       elsif ["vcs","python","perl","interpreters","cli-mono"].include? section
         sec = :devel
-      elsif ["x11","gnome","kde"].include? section
+      elsif ["gnome","kde"].include? section
         sec = section.to_sym
       elsif ["tex"].include? section
         sec = :userapps
+      elsif ["x11"].include? section
+        sec = :xorg
       elsif cmp.to.startswith? "ibus-" or cmp.to == "ibus"
         sec = :baseapps
       else
@@ -108,9 +113,15 @@ create_data do
         others << [cmp.to,cmp.to_loc.to_i,homepage]
       end
     end
+    size = cmp.to_loc.to_i
+    churn = cmp.insertions.to_i+cmp.deletions.to_i
+
+    if sec == :gnu
+      gnupkgs[cmp.to] = [size,churn]
+    end
     if sec and sec != :ignore
-      results[sec][0] += cmp.to_loc.to_i
-      results[sec][1] += (cmp.insertions.to_i+cmp.deletions.to_i)
+      results[sec][0] += size
+      results[sec][1] += churn
     end
   end
 
@@ -118,13 +129,43 @@ create_data do
   #$stdout.flush
   #$stderr.puts "#{others.size} package in :others"
 
-  total = results.values.reduce{|a,b| [a[0]+b[0],a[1]+b[1]]}
 
-  finalcats = [:gnu, :kernel, :gnome, :kde, :mozilla, :java, :openoffice]
 
-  File.open(datafile, "w") do |f|    
+  finalcats = [:gnu, :kernel, :kde, :mozilla, :java, :gnome, :xorg]
+  sum2 = Proc.new{|a,b| [a[0]+b[0],a[1]+b[1]]}
+
+  finalresults = {}
+  finalcats.each {|cat| finalresults[cat]=results[cat]}
+  finalresults[:kernel] = sum2.call(results[:kernel],results[:kernelaid])
+
+  total = results.values.reduce(&sum2)
+  considered = finalresults.values.reduce(&sum2)
+  finalresults[:other] = [total[0]-considered[0],total[1]-considered[1]]
+
+  File.open(datafile(1), "w") do |f|    
     f.puts "LABEL SIZE CHURN"
-    finalcats.each {|cat| f.puts cat.to_s+" "+results[cat].join(" ")}
-    f.puts "total "+total.join(" ")
+    (finalcats+[:other]).each {|cat| f.puts cat.to_s+" "+finalresults[cat].join(" ")}
   end
+
+  finalpkgs = {:gcc => ["gcc-4.5","gcj-4.5"], :gdb => "gdb", :binutils => "binutils",
+               :glibc => "eglibc", :gettext => "gettext", :emacs => "emacs23",
+               :coreutils => "coreutils", :grub => "grub2", :gnutls => "gnutls26",
+               :gnupg => ["gnupg2","gpgme1.0"], :gsl => "gsl",
+               :libunistring => "libunistring",:mailman=>"mailman"}
+  finalresults = []
+  finalpkgs.each do |name, pkg|
+    pkgs = ((pkg.instance_of? Array) ? pkg : [pkg])
+    finalresults << [name, pkgs.map{|pkg| gnupkgs[pkg]}.reduce(&sum2)]
+  end
+  total = gnupkgs.values.reduce(&sum2)
+  considered = finalresults.map{|n,vals| vals}.reduce(&sum2)
+  finalresults.sort!{|a,b| a[1][0] <=> b[1][0]}
+  finalresults << [:other, [total[0]-considered[0],total[1]-considered[1]]]
+
+  File.open(datafile(2), "w") do |f|    
+    f.puts "PKG_LABEL PKG_SIZE PKG_CHURN"
+    finalresults.each{|pkg, values| f.puts pkg.to_s+" "+values.join(" ")}
+  end
+
+  gnupkgs.each{|pkg, values| p [pkg, values[0]] if values[0] > 100000}
 end

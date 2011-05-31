@@ -45,22 +45,13 @@ class RTask
   # output text, and generates pngs with convert from the R pdf plots
 
   def initialize(file)
-    @plots = []
-    @pngs = []
     @filename = file
     @name = File.basename(file).split(".")[0]
     eval_file(file)
-    mkdirtask = Rake::Task.define_task("mkdir_"+@name){FileUtils.mkdir_p GENDIR+@name}
-    @maintask = Rake::Task.define_task(@name => [mkdirtask,datafile]+@plots+@pngs)
-    @maintask.add_description @desc if @desc
   end
 
-  def eval_file(file)
-    eval(File.read(file), binding, file)
-  end
-
-  def datafile
-    GENDIR+@name+"/data"
+  def datafile(num=1)
+    GENDIR+@name+"/data"+num.to_s
   end
 
   def rfile
@@ -72,31 +63,65 @@ class RTask
   end
 
   def run_R(opts={})
-    @plots << (output = GENDIR+@name+"/Rplots.pdf")
-    Rake::FileTask.define_task(output => [datafile,rfile,__FILE__]) do
-      exec_R(rfile, datafile)
-    end
+    @ropts = opts
   end
 
   def png(page, name, opts={})
-    @pngs << (filename = GENDIR+@name+"/"+name+".png")
-    Rake::FileTask.define_task(filename => [@plots,__FILE__]) do
-      exec_convert(page,filename,opts)
-    end
+    @png_runs[name] = [page,opts]
   end
 
-  def create_data(&f)
-    Rake::FileTask.define_task(datafile => [:compare_all_dists, @filename, __FILE__]) do
-      f.call
-    end
+  def create_data(num=1,&f)
+    @ndatas = num
+    @data_proc = f
   end
 
-  def exec_R(rfile, dfile)
+  private
+  def eval_file(file)
+    @png_runs = {}
+    eval(File.read(file), binding, file)
+
+    # Data currently depends on "compare_all_dists" although it doesn't have to
+    @datafiles = []
+    (1..@ndatas).each do |i|
+      @datafiles << datafile(i)
+      Rake::FileTask.define_task(datafile(i) => [:compare_all_dists, @filename, __FILE__]) do
+        @data_proc.call
+      end
+    end
+
+    # Plots depend on data
+    @plots = []
+    if @ropts
+      @plots << (output = GENDIR+@name+"/Rplots.pdf")
+      Rake::FileTask.define_task(output => @datafiles+[rfile,__FILE__]) do
+        exec_R(rfile)
+      end
+    end
+
+    # Pngs depend on plots
+    @pngs = []
+    @png_runs.each do |name, opts|
+      page,opts = opts
+      @pngs << (filename = GENDIR+@name+"/"+name+".png")
+      Rake::FileTask.define_task(filename => @plots+[__FILE__]) do
+        exec_convert(page,filename,opts)
+      end
+    end
+
+    # Main tasks
+    mkdirtask = Rake::Task.define_task("mkdir_"+@name){FileUtils.mkdir_p GENDIR+@name}
+    @maintask = Rake::Task.define_task(@name => [mkdirtask]+@datafiles+@plots+@pngs)
+    @maintask.add_description @desc if @desc
+  end
+
+  def exec_R(rfile)
     $stderr.puts "Running #{rfile}"
     IO.popen("R --slave --vanilla","w+") do |proc|
       proc.puts("pdf(file=\"#{GENDIR}#{@name}/Rplots.pdf\",width=9,height=5)")
-      proc.puts("DATA <- read.table(\"#{dfile}\", header=TRUE)")
-      proc.puts("attach(DATA)")
+      @datafiles.each do |dfile|
+        proc.puts("DATA <- read.table(\"#{dfile}\", header=TRUE)")
+        proc.puts("attach(DATA)")
+      end
       proc.puts File.read(rfile)
       proc.close_write
       output = proc.read
@@ -107,6 +132,6 @@ class RTask
   def exec_convert(page, filename, opts)
     $stderr.puts "Writing #{filename}"
     copts = opts.map{|v| v.split}.flatten
-    sh *(["convert","-density","600x600"]+copts+[@plots[0]+"[#{page}]", filename])
+    sh *(["convert","-density","1000x1000"]+copts+[@plots[0]+"[#{page}]", filename])
   end
 end
