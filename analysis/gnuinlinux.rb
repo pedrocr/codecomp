@@ -166,6 +166,4 @@ create_data(2) do
     f.puts "PKG_LABEL PKG_SIZE PKG_CHURN"
     finalresults.each{|pkg, values| f.puts pkg.to_s+" "+values.join(" ")}
   end
-
-  gnupkgs.each{|pkg, values| p [pkg, values[0]] if values[0] > 100000}
 end
