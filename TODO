@@ -2,6 +2,6 @@ Priority
 
 Short-Term
 
-Do some basic analysis of what ammount of effort goes into each level of the stack
+Use sloccount as another measure instead of my find|wc hack
 Obtain per-release or timeseries data on popularity
 Do a regression to explain popularity differences (ln(P2) = Rln(P1) + BX + E) where X is the amount of code differences
