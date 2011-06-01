@@ -1,8 +1,8 @@
 desc "figure out how much of Ubuntu is GNU"
 
 run_R
-png 0, "totalsplit", ["-trim", "-geometry 400x9990"]
-png 1, "gnusplit", ["-trim", "-geometry 400x9999"]
+png 0, "totalsplit", ["-trim", "-geometry 9999x300","-bordercolor white","-border 10x10"]
+png 1, "gnusplit", ["-trim", "-geometry 9999x300","-bordercolor white","-border 10x10"]
 
 create_data(2) do
   $stderr.puts "Running gnuinlinux"
