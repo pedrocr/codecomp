@@ -70,6 +70,10 @@ class RTask
     @png_runs[name] = [page,opts]
   end
 
+  def pdf(page, name, opts={})
+    @pdf_runs[name] = [page,opts]
+  end
+
   def create_data(num=1,&f)
     @ndatas = num
     @data_proc = f
@@ -78,6 +82,7 @@ class RTask
   private
   def eval_file(file)
     @png_runs = {}
+    @pdf_runs = {}
     eval(File.read(file), binding, file)
 
     # Data currently depends on "compare_all_dists" although it doesn't have to
@@ -108,9 +113,19 @@ class RTask
       end
     end
 
+    # Pdfs depend on plots
+    @pdfs = []
+    @pdf_runs.each do |name, opts|
+      page,opts = opts
+      @pdfs << (filename = GENDIR+@name+"/"+name+".pdf")
+      Rake::FileTask.define_task(filename => @plots+[__FILE__]) do
+        exec_pdf(page,filename,opts)
+      end
+    end
+
     # Main tasks
     mkdirtask = Rake::Task.define_task("mkdir_"+@name){FileUtils.mkdir_p GENDIR+@name}
-    @maintask = Rake::Task.define_task(@name => [mkdirtask]+@datafiles+@plots+@pngs)
+    @maintask = Rake::Task.define_task(@name => [mkdirtask]+@datafiles+@plots+@pngs+@pdfs)
     @maintask.add_description @desc if @desc
   end
 
@@ -133,5 +148,13 @@ class RTask
     $stderr.puts "Writing #{filename}"
     copts = opts.map{|v| v.split}.flatten
     sh *(["convert","-density","1000x1000"]+copts+[@plots[0]+"[#{page}]", filename])
+  end
+
+  def exec_pdf(page, filename, opts)
+    $stderr.puts "Writing #{filename}"
+    tmpfile = filename+".temp"
+    sh "pdftk", "A=#{@plots[0]}", "cat", "A#{page+1}", "output", tmpfile
+    sh "sh /usr/bin/pdfcrop #{tmpfile} #{filename}" #FIXME why do we need sh and /usr/bin ?!
+    rm tmpfile
   end
 end
