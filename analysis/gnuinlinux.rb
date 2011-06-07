@@ -88,7 +88,6 @@ create_data(2) do
       vcsbrowser = pkg.vcsbrowser||""
       maintainer = pkg.maintainer||""
       EXTRA_PACKAGES.each{|s, pkgs| sec = s if pkgs.include? cmp.to}
-#      cats.each{|cat| sec = cat if (EXTRA_PACKAGES[cat]||[]).include? cmp.to}
       if sec
         # We're done
       elsif pkg.priority == "extra"
