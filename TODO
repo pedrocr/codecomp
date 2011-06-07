@@ -2,6 +2,7 @@ Priority
 
 Short-Term
 
+Abstract EXTRA_PACKAGES into a full data structure that includes the safeguards
 Use sloccount as another measure instead of my find|wc hack
 Obtain per-release or timeseries data on popularity
 Do a regression to explain popularity differences (ln(P2) = Rln(P1) + BX + E) where X is the amount of code differences

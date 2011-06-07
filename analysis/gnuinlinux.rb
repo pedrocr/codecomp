@@ -2,9 +2,9 @@ desc "figure out how much of Ubuntu is GNU"
 
 run_R
 png 0, "totalsplit", ["-trim", "-geometry 9999x300","-bordercolor white","-border 10x10"]
-pdf 0, "totalsplit"
+#pdf 0, "totalsplit"
 png 1, "gnusplit", ["-trim", "-geometry 9999x300","-bordercolor white","-border 10x10"]
-pdf 1, "gnusplit"
+#pdf 1, "gnusplit"
 
 create_data(2) do
   $stderr.puts "Running gnuinlinux"
@@ -20,13 +20,13 @@ create_data(2) do
                      syslinux util-linux udev e2fsprogs openhpi reiserfsprogs 
                      reiser4progs libusb net-tools strace elfutils jfsutils xfsdump 
                      xfsprogs crash openipmi lvm2 apparmor ocfs2-tools alsa-lib
-                     apparmor v4lutils mdadm binfmt-support ecryptfs-utils
-                     kexec-tools linux-ntfs squashfs-tools},
+                     v4lutils mdadm binfmt-support ecryptfs-utils kexec-tools 
+                     linux-ntfs squashfs-tools},
     :bsd => %w{openssh bsdmainutils},
     :gnome => %w{gimp gimp-help gcalctool gnome-vfs gvfs gconf-editor libbonobo 
                  libbonoboui},
     :misc => %w{likewise-open eucalyptus-commons-ext rpm},
-    :java => %{openjdk-6b18},
+    :java => %w{openjdk-6b18},
     :devel => %w{llvm-2.8 boost1.42 gccxml subversion bzr valgrind git tcl8.5 
                  tk8.4 tk8.5  php5 cmake cpu-checker groovy puppet nasm re2c 
                  mono-tools linux86 libsigc++-2.0},
@@ -50,11 +50,25 @@ create_data(2) do
                     ncurses hplip avahi pango1.0 gegl nas blas foomatic-db
                     libvorbis orbit2 klibc gupnp u-boot},
     :xorg => %w{mesa},
-    :ubuntu => %{installation-guidei usb-creator upstart},
+    :ubuntu => %w{installation-guide usb-creator upstart},
     :debian => %w{synaptic apt-setup base-installer debconf gdebi devscripts 
                   aptitude apt tasksel debian-installer},
     :ignore => %w{linux-backports-modules-2.6.38 llvm-2.7 openjdk-6}
   }
+
+  # Make sure no package was classified twice and that all lists of packages are
+  # actually arrays. %w{ is easy to mistake for %{
+  reversed = {}
+  EXTRA_PACKAGES.each do |s, pkgs|
+    Util.fatal_error "EXTRA_PACKAGES for #{s} not Array" if pkgs.class != Array
+    pkgs.each do |p|
+      if reversed[p]
+        Util.fatal_error "pkg #{p} classified both as #{reversed[p]} and #{s}"
+      else
+        reversed[p] = s
+      end
+    end
+  end
 
   cats = [:other,:misc,:userapps,:libreoffice,:baseapps,:java,:gnome,:kde,:gnu,:debian,
           :ubuntu,:apache,:mozilla,:freedesktop,:bsd,:devel,:xorg,:kernelaid,:kernel]
@@ -74,6 +88,7 @@ create_data(2) do
       vcsbrowser = pkg.vcsbrowser||""
       maintainer = pkg.maintainer||""
       EXTRA_PACKAGES.each{|s, pkgs| sec = s if pkgs.include? cmp.to}
+#      cats.each{|cat| sec = cat if (EXTRA_PACKAGES[cat]||[]).include? cmp.to}
       if sec
         # We're done
       elsif pkg.priority == "extra"
@@ -121,6 +136,7 @@ create_data(2) do
     if sec == :gnu
       gnupkgs[cmp.to] = [size,churn]
     end
+
     if sec and sec != :ignore
       results[sec][0] += size
       results[sec][1] += churn
