@@ -1,7 +1,7 @@
 desc "plot sections by code churn"
 run_R
 png 0, "figure", ["-geometry 550x9999"]
-pdf 0, "sizevschurn"
+pdf 0, "sectionsplit"
 
 create_data do
   churns = {}
