@@ -154,7 +154,7 @@ class RTask
     $stderr.puts "Writing #{filename}"
     tmpfile = filename+".temp"
     sh "pdftk", "A=#{@plots[0]}", "cat", "A#{page+1}", "output", tmpfile
-    sh "sh /usr/bin/pdfcrop #{tmpfile} #{filename}" #FIXME why do we need sh and /usr/bin ?!
+    sh "sh /usr/bin/pdfcrop --margins 10 #{tmpfile} #{filename}" #FIXME why do we need sh and /usr/bin ?!
     rm tmpfile
   end
 end
