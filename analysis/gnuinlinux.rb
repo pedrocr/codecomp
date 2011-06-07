@@ -148,7 +148,7 @@ create_data(2) do
 
 
 
-  finalcats = [:gnu, :kernel, :kde, :mozilla, :java, :gnome, :xorg]
+  finalcats = [:gnu, :kernel, :kde, :mozilla, :gnome, :java, :xorg]
   sum2 = Proc.new{|a,b| [a[0]+b[0],a[1]+b[1]]}
 
   finalresults = {}
